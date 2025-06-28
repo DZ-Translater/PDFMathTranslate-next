@@ -33,14 +33,16 @@ dependencies = [
     "gradio_pdf>=0.0.21",
     "peewee>=3.17.8",
     "fontTools",
-    "babeldoc>=0.3.64, <0.4.0",
+    "babeldoc>=0.3.64,<0.4.0",
+    "packaging",
     "rich",
     "pydantic-settings>=2.8.1",
     "pydantic>=2.10.6",
     "httpx>=0.28.1",
     "sse-starlette>=2.3.3",
     "fastapi>=0.115.12",
-    "uvicorn>=0.34.2",
+    "uvicorn[standard]>=0.34.2",
+    "python-multipart>=0.0.6",
     "legacy-cgi; python_version >= '3.13'",
 ]
 

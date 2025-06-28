@@ -1,0 +1,444 @@
+/* CSS Variables */
+:root {
+    --primary-color: #165DFF;
+    --primary-hover: #0E42D2;
+    --secondary-color: #f5f5f5;
+    --text-color: #333;
+    --border-color: #ddd;
+    --error-color: #ff4757;
+    --success-color: #2ed573;
+    --warning-color: #ffa502;
+    --background-color: #fff;
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --border-radius: 8px;
+    --spacing: 1rem;
+}
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--secondary-color);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--spacing);
+}
+
+/* Main content */
+main {
+    display: grid;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Section styles */
+.upload-section,
+.settings-section,
+.action-section,
+.progress-section,
+.results-section {
+    background: var(--background-color);
+    padding: 1.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.upload-section h2,
+.settings-section h2,
+.progress-section h2,
+.results-section h2 {
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* File upload */
+.file-upload {
+    margin-bottom: 1rem;
+}
+
+.upload-area {
+    border: 2px dashed var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+    background-color: #f8f9ff;
+    border-color: var(--primary-hover);
+}
+
+.upload-area.dragover {
+    background-color: #e8f3ff;
+    border-color: var(--primary-color);
+}
+
+.upload-icon {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: var(--border-radius);
+    margin-top: 0.5rem;
+}
+
+/* Settings */
+.settings-group {
+    margin-bottom: 1rem;
+}
+
+.settings-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.settings-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.settings-group input,
+.settings-group select,
+.settings-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.settings-group input:focus,
+.settings-group select:focus,
+.settings-group textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(22, 93, 255, 0.1);
+}
+
+.settings-group textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Engine settings */
+.engine-settings {
+    margin: 1rem 0;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+}
+
+.engine-settings h3 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+}
+
+/* Environment variable status */
+.env-status {
+    margin-top: 0.5rem;
+}
+
+.env-item {
+    padding: 0.5rem;
+    margin: 0.25rem 0;
+    border-radius: 4px;
+    font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+    font-size: 0.9rem;
+}
+
+.env-success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.env-warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+}
+
+.env-var {
+    font-weight: 600;
+}
+
+.env-value {
+    font-weight: normal;
+}
+
+/* Read-only inputs */
+.readonly-input {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    cursor: not-allowed;
+}
+
+/* Advanced settings */
+.advanced-settings {
+    margin-top: 1.5rem;
+}
+
+.advanced-settings summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--primary-color);
+    padding: 0.5rem 0;
+    user-select: none;
+}
+
+.advanced-settings summary:hover {
+    color: var(--primary-hover);
+}
+
+.advanced-settings h3 {
+    margin: 1.5rem 0 1rem 0;
+    color: var(--text-color);
+    font-size: 1.2rem;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+}
+
+/* Checkbox groups */
+.checkbox-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.checkbox-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+    transition: background-color 0.2s ease;
+}
+
+.checkbox-group label:hover {
+    background-color: #f8f9fa;
+}
+
+.checkbox-group input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+/* Range input styling */
+input[type="range"] {
+    width: calc(100% - 40px);
+    margin-right: 10px;
+}
+
+#shortLineSplitFactorValue {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* Buttons */
+.primary-button,
+.secondary-button,
+.download-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+}
+
+.primary-button {
+    background-color: var(--primary-color);
+    color: white;
+}
+
+.primary-button:hover:not(:disabled) {
+    background-color: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(22, 93, 255, 0.3);
+}
+
+.primary-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.secondary-button {
+    background-color: var(--error-color);
+    color: white;
+}
+
+.secondary-button:hover {
+    background-color: #ff3742;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 71, 87, 0.3);
+}
+
+.download-button {
+    background-color: var(--success-color);
+    color: white;
+    margin-right: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.download-button:hover {
+    background-color: #26de81;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(46, 213, 115, 0.3);
+}
+
+/* Action section */
+.action-section {
+    text-align: center;
+}
+
+/* Progress section */
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background-color: var(--secondary-color);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 1rem 0;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+    width: 0%;
+    transition: width 0.3s ease;
+    border-radius: 10px;
+}
+
+.progress-text {
+    font-weight: 600;
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.progress-details {
+    font-size: 0.9rem;
+    color: #666;
+    text-align: center;
+}
+
+/* Results section */
+.download-buttons {
+    margin-bottom: 1.5rem;
+}
+
+.translation-stats {
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--success-color);
+}
+
+.translation-stats h4 {
+    color: var(--success-color);
+    margin-bottom: 0.5rem;
+}
+
+
+/* Error states */
+.error {
+    color: var(--error-color);
+    background-color: #fff5f5;
+    border: 1px solid #fed7d7;
+    padding: 0.75rem;
+    border-radius: var(--border-radius);
+    margin: 0.5rem 0;
+}
+
+.success {
+    color: var(--success-color);
+    background-color: #f0fff4;
+    border: 1px solid #9ae6b4;
+    padding: 0.75rem;
+    border-radius: var(--border-radius);
+    margin: 0.5rem 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        padding: 0.5rem;
+    }
+    
+    .settings-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .upload-area {
+        padding: 1.5rem;
+    }
+    
+    .upload-icon {
+        font-size: 2rem;
+    }
+}
+
+/* Loading animations */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Hide/show elements */
+.hidden {
+    display: none !important;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
