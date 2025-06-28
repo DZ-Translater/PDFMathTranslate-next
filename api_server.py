@@ -238,17 +238,17 @@ def _build_settings_from_request(
         # Configure OpenAI settings
         settings.openai = True
         settings.azure = False
-        settings.openai_settings.api_key = os.getenv("OPENAI_API_KEY", "")
-        settings.openai_settings.base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
-        settings.openai_settings.model = "gpt-4o-mini"
+        settings.openai_detail.openai_api_key = os.getenv("OPENAI_API_KEY", "")
+        settings.openai_detail.openai_base_url = os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1")
+        settings.openai_detail.openai_model = "gpt-4o-mini"
         
     elif request.service == "claude-3-5-sonnet-20240620":
         # Configure Claude via OpenAI-compatible API
         settings.openai = True
         settings.azure = False
-        settings.openai_settings.api_key = os.getenv("ANTHROPIC_API_KEY", "")
-        settings.openai_settings.base_url = os.getenv("ANTHROPIC_BASE_URL", "https://api.anthropic.com/v1")
-        settings.openai_settings.model = "claude-3-5-sonnet-20240620"
+        settings.openai_detail.openai_api_key = os.getenv("ANTHROPIC_API_KEY", "")
+        settings.openai_detail.openai_base_url = os.getenv("ANTHROPIC_BASE_URL", "https://api.anthropic.com/v1")
+        settings.openai_detail.openai_model = "claude-3-5-sonnet-20240620"
     
     # Disable all other translation engines
     settings.bing = False
