@@ -4,12 +4,17 @@
 
 ## 🤖 支持的模型
 
-### 1. GPT-4o Mini
+### 1. Claude Sonnet 4 (默认)
+- **模型名称**: `claude-sonnet-4-20250514`
+- **提供商**: Anthropic
+- **特点**: 最新一代Claude模型，具有卓越的翻译质量和理解能力
+
+### 2. GPT-4o Mini
 - **模型名称**: `gpt-4o-mini`
 - **提供商**: OpenAI
 - **特点**: 快速、经济的GPT-4级别模型
 
-### 2. Claude 3.5 Sonnet
+### 3. Claude 3.5 Sonnet
 - **模型名称**: `claude-3-5-sonnet-20240620`
 - **提供商**: Anthropic
 - **特点**: 高质量的长文本理解和翻译
@@ -37,6 +42,12 @@ export ANTHROPIC_BASE_URL="https://api.anthropic.com/v1"  # 可选，默认值
 ### 方式 1: Docker 直接运行
 
 ```bash
+# 使用 Claude Sonnet 4 (推荐默认)
+docker run -it --rm -p 8080:8080 \
+  -e ANTHROPIC_API_KEY="your-api-key" \
+  -e ANTHROPIC_BASE_URL="https://api.anthropic.com/v1" \
+  yzg963/pdfmathtranslate-next
+
 # 使用 GPT-4o Mini
 docker run -it --rm -p 8080:8080 \
   -e OPENAI_API_KEY="your-api-key" \
@@ -102,7 +113,8 @@ docker run -it --rm -p 8080:8080 --env-file .env yzg963/pdfmathtranslate-next
 1. **启动服务**后访问: http://localhost:8080
 
 2. **翻译服务选择**:
-   - 从下拉菜单选择 `gpt-4o-mini` 或 `claude-3-5-sonnet-20240620`
+   - 默认选择 `claude-sonnet-4-20250514` (Claude Sonnet 4)
+   - 可选择 `gpt-4o-mini` 或 `claude-3-5-sonnet-20240620`
    - 界面会显示环境变量配置状态
 
 3. **环境变量状态**:
@@ -171,6 +183,7 @@ docker-compose logs -f pdf2zh-api
 ## 🎯 使用建议
 
 1. **模型选择**:
+   - **Claude Sonnet 4**: 推荐默认选择，具有最佳的翻译质量和理解能力
    - **GPT-4o Mini**: 适合快速、经济的翻译需求
    - **Claude 3.5 Sonnet**: 适合高质量、长文档翻译
 

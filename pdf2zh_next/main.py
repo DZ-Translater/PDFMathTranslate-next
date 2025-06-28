@@ -84,13 +84,9 @@ async def main() -> int:
         return 0
 
     if settings.basic.gui:
-        from pdf2zh_next.gui import setup_gui
-
-        setup_gui(
-            auth_file=settings.gui_settings.auth_file,
-            welcome_page=settings.gui_settings.welcome_page,
-        )
-        return 0
+        print("GUI mode has been removed. Please use the FastAPI server instead.")
+        print("Run: python api_server.py")
+        return 1
 
     assert len(settings.basic.input_files) >= 1, "At least one input file is required"
     await do_translate_file_async(settings, ignore_error=True)

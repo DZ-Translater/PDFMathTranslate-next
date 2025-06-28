@@ -195,8 +195,8 @@ function populateLanguageSelects() {
     });
     
     // Set default values
-    langFromSelect.value = 'English';
-    langToSelect.value = 'Simplified Chinese';
+    langFromSelect.value = 'Simplified Chinese';
+    langToSelect.value = 'English';
 }
 
 function populateServiceSelect() {

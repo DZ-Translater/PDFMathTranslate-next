@@ -144,7 +144,7 @@ If you don't know what code to use to translate to the language you need, check 
 
 - Document extraction: [MinerU](https://github.com/opendatalab/MinerU)
 
-- Document Preview: [Gradio PDF](https://github.com/freddyaboulton/gradio-pdf)
+- Web Interface: FastAPI with modern HTML/CSS/JavaScript frontend
 
 - Multi-threaded translation: [MathTranslate](https://github.com/SUSYUSTC/MathTranslate)
 
