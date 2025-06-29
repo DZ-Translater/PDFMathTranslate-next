@@ -14,6 +14,8 @@ from typing import List
 from typing import Optional
 from typing import Union
 
+from dotenv import load_dotenv
+
 import uvicorn
 from fastapi import BackgroundTasks
 from fastapi import FastAPI
@@ -147,14 +149,14 @@ async def get_services() -> List[ServiceInfo]:
         {
             "name": "claude-sonnet-4-20250514",
             "display_name": "Claude Sonnet 4",
-            "service_type": "OpenAI",  # Using OpenAI-compatible API
+            "service_type": "Anthropic",  # Using OpenAI-compatible API
             "env_vars": ["ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL"],
         },
         {"name": "gpt-4o-mini", "display_name": "GPT-4o Mini", "service_type": "OpenAI", "env_vars": ["OPENAI_API_KEY", "OPENAI_BASE_URL"]},
         {
             "name": "claude-3-5-sonnet-20240620",
             "display_name": "Claude 3.5 Sonnet",
-            "service_type": "OpenAI",  # Using OpenAI-compatible API
+            "service_type": "Anthropic",  # Using OpenAI-compatible API
             "env_vars": ["ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL"],
         },
     ]
@@ -204,9 +206,9 @@ def _build_settings_from_request(request: TranslationRequest, file_path: Path, o
 
     # Map selected model to appropriate service
     model_service_map = {
-        "claude-sonnet-4-20250514": "OpenAI",  # Claude via OpenAI-compatible API
+        "claude-sonnet-4-20250514": "Anthropic",  # Claude via OpenAI-compatible API
         "gpt-4o-mini": "OpenAI",
-        "claude-3-5-sonnet-20240620": "OpenAI",  # Claude via OpenAI-compatible API
+        "claude-3-5-sonnet-20240620": "Anthropic",  # Claude via OpenAI-compatible API
     }
 
     # Get the appropriate service name
@@ -502,6 +504,9 @@ async def health_check():
 def main():
     """Main entry point for the API server"""
     import os
+    
+    # Load environment variables from .env.local file first, then from system environment
+    load_dotenv(".env.local")
 
     # Create static directory if it doesn't exist
     static_dir = Path("static")

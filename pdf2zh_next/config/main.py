@@ -352,7 +352,12 @@ class ConfigManager:
                 if parsed:
                     env_settings[field_name] = parsed
             else:
-                type_hint = typing.get_type_hints(settings_model)[field_name]
+                try:
+                    type_hint = typing.get_type_hints(settings_model)[field_name]
+                except KeyError:
+                    log.warning(f"Field {field_name} not found in type hints")
+                    continue
+                    
                 env_name = f"{prefix}{field_name.upper()}"
 
                 if env_name in dict_vars:
@@ -374,8 +379,6 @@ class ConfigManager:
                         log.warning(
                             f"Could not convert environment variable {env_name}: {e}"
                         )
-                    else:
-                        log.warning(f"Field {field_name} not found in type hints")
 
         if recursion_depth == 0:
             log.debug(f"Environment settings: {env_settings}")
