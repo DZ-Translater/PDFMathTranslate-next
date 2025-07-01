@@ -1,8 +1,5 @@
-console.log('🔍 script.js loaded successfully');
-
 // Global variables
 let currentFile = null;
-let currentFileId = null;
 let currentTaskId = null;
 let statusPollingInterval = null;
 let availableLanguages = [];
@@ -14,7 +11,6 @@ const uploadArea = document.getElementById('uploadArea');
 const fileInfo = document.getElementById('fileInfo');
 const fileName = document.getElementById('fileName');
 const removeFileBtn = document.getElementById('removeFile');
-const uploadBtn = document.getElementById('uploadBtn');
 const translateBtn = document.getElementById('translateBtn');
 const cancelBtn = document.getElementById('cancelBtn');
 const progressSection = document.getElementById('progressSection');
@@ -36,11 +32,6 @@ const engineSettings = document.getElementById('engineSettings');
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔍 DOM loaded, checking elements...');
-    console.log('uploadBtn element:', uploadBtn);
-    console.log('fileInput element:', fileInput);
-    console.log('uploadArea element:', uploadArea);
-    
     initializeApp();
     setupEventListeners();
 });
@@ -67,11 +58,7 @@ function setupEventListeners() {
     fileInput.addEventListener('change', handleFileSelect);
     removeFileBtn.addEventListener('click', removeFile);
     
-    // Upload and translation
-    uploadBtn.addEventListener('click', function() {
-        console.log('🔍 Upload button clicked, disabled:', uploadBtn.disabled);
-        uploadFile();
-    });
+    // Translation
     translateBtn.addEventListener('click', startTranslation);
     cancelBtn.addEventListener('click', cancelTranslation);
     
@@ -140,8 +127,6 @@ function handleFileSelect(e) {
 }
 
 function handleFile(file) {
-    console.log('🔍 handleFile called with:', file.name, file.size);
-    
     if (!file.name.toLowerCase().endsWith('.pdf')) {
         showError('请选择PDF文件。');
         return;
@@ -156,23 +141,14 @@ function handleFile(file) {
     fileName.textContent = file.name;
     uploadArea.style.display = 'none';
     fileInfo.style.display = 'flex';
-    uploadBtn.disabled = false;
-    
-    console.log('✅ Upload button enabled');
-    
-    // Reset states
-    currentFileId = null;
-    translateBtn.disabled = true;
-    resetTranslationUI();
+    translateBtn.disabled = false;
 }
 
 function removeFile() {
     currentFile = null;
-    currentFileId = null;
     fileInput.value = '';
     uploadArea.style.display = 'block';
     fileInfo.style.display = 'none';
-    uploadBtn.disabled = true;
     translateBtn.disabled = true;
     resetTranslationUI();
 }
@@ -328,8 +304,10 @@ function togglePageInput() {
     pageInput.style.display = pageRangeSelect.value === 'Range' ? 'block' : 'none';
 }
 
-// Step 1: Upload file
-async function uploadFile() {
+// Translation process
+async function startTranslation() {
+    console.log('🚀 startTranslation called - DEBUG VERSION 2');
+    
     if (!currentFile) {
         showError('请先选择PDF文件。');
         return;
@@ -337,79 +315,59 @@ async function uploadFile() {
     
     try {
         // Disable UI
-        uploadBtn.disabled = true;
-        uploadBtn.textContent = '上传中...';
-        
-        // Create FormData for file upload
-        const formData = new FormData();
-        formData.append('file', currentFile);
-        
-        const response = await fetch('/api/files/upload', {
-            method: 'POST',
-            body: formData
-        });
-        
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.detail || '文件上传失败');
-        }
-        
-        const result = await response.json();
-        currentFileId = result.file_id;
-        
-        // Update UI to show upload success
-        uploadBtn.textContent = '✅ 上传成功';
-        uploadBtn.classList.add('success');
-        translateBtn.disabled = false;
-        
-        // Update step UI
-        const uploadStep = document.getElementById('uploadStep');
-        const translateStep = document.getElementById('translateStep');
-        const translateStatus = document.getElementById('translateStatus');
-        
-        uploadStep.classList.remove('active');
-        uploadStep.classList.add('completed');
-        translateStep.classList.add('active');
-        translateStatus.className = 'workflow-status success';
-        translateStatus.textContent = `文件已上传：${result.filename} (${(result.size / 1024).toFixed(1)} KB) - 现在可以配置翻译参数并开始翻译`;
-        
-        showSuccess(`文件上传成功：${result.filename} (${(result.size / 1024).toFixed(1)} KB)`);
-        
-    } catch (error) {
-        console.error('Upload error:', error);
-        showError(`文件上传失败：${error.message}`);
-        
-        // Reset upload button
-        uploadBtn.disabled = false;
-        uploadBtn.textContent = '上传文件';
-        uploadBtn.classList.remove('success');
-    }
-}
-
-// Step 2: Start translation
-async function startTranslation() {
-    if (!currentFileId) {
-        showError('请先上传PDF文件。');
-        return;
-    }
-    
-    try {
-        // Disable UI
         translateBtn.disabled = true;
-        translateBtn.textContent = '启动翻译中...';
+        translateBtn.textContent = '上传文件中...';
         
-        // Collect translation settings
+        // Step 1: Upload file
+        const fileId = await uploadFile();
+        
+        // Step 2: Start translation
+        translateBtn.textContent = '启动翻译中...';
         const requestData = collectTranslationSettings();
         
-        const response = await fetch('/api/translate', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                file_id: currentFileId,
-                config: requestData
-            })
+        // Debug logging
+        console.log('🔍 File ID:', fileId);
+        console.log('🔍 Config data keys:', Object.keys(requestData));
+        console.log('🔍 Config data preview:', JSON.stringify(requestData).substring(0, 200));
+        
+        // Check if currentFile is accidentally included
+        console.log('🔍 currentFile variable:', currentFile ? 'File object present' : 'null');
+        
+        const requestPayload = {
+            file_id: fileId,
+            config: requestData
+        };
+        
+        // Ensure no file objects are included
+        const requestBody = JSON.stringify(requestPayload);
+        
+        console.log('🔍 Final request body length:', requestBody.length);
+        console.log('🔍 Final request body preview:', requestBody.substring(0, 200));
+        
+        console.log('🚀 About to make fetch request...');
+        
+        // Use XMLHttpRequest instead of fetch to avoid any potential interception
+        const response = await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/translate');
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            
+            xhr.onload = () => {
+                console.log('🚀 XMLHttpRequest completed:', xhr.status);
+                resolve({
+                    ok: xhr.status >= 200 && xhr.status < 300,
+                    status: xhr.status,
+                    json: () => Promise.resolve(JSON.parse(xhr.responseText))
+                });
+            };
+            
+            xhr.onerror = () => {
+                console.error('🚀 XMLHttpRequest error');
+                reject(new Error('Network error'));
+            };
+            
+            console.log('🚀 Sending XMLHttpRequest with body:', requestBody.substring(0, 100));
+            xhr.send(requestBody);
         });
         
         if (!response.ok) {
@@ -429,6 +387,25 @@ async function startTranslation() {
         showError(`翻译失败：${error.message}`);
         resetTranslationUI();
     }
+}
+
+// Upload file and return file ID
+async function uploadFile() {
+    const formData = new FormData();
+    formData.append('file', currentFile);
+    
+    const response = await fetch('/api/files/upload', {
+        method: 'POST',
+        body: formData
+    });
+    
+    if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || '文件上传失败');
+    }
+    
+    const result = await response.json();
+    return result.file_id;
 }
 
 function collectTranslationSettings() {
@@ -611,7 +588,7 @@ async function downloadFile(fileType) {
 }
 
 function resetTranslationUI() {
-    translateBtn.disabled = !currentFileId;
+    translateBtn.disabled = currentFile === null;
     translateBtn.textContent = '开始翻译';
     cancelBtn.style.display = 'none';
     progressSection.style.display = 'none';

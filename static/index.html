@@ -1,16 +1,122 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PDFMathTranslate - PDF文档翻译服务</title>
     <link rel="stylesheet" href="/static/style.css">
+    <style>
+        /* Additional styles for two-step workflow */
+        .step-container {
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+        }
+
+        .step-container.completed {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .step-container.active {
+            border-color: #007bff;
+            background: #e7f3ff;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #6c757d;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+
+        .step-container.completed .step-number {
+            background: #28a745;
+        }
+
+        .step-container.active .step-number {
+            background: #007bff;
+        }
+
+        .step-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .upload-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .upload-button:hover:not(:disabled) {
+            background: #218838;
+            transform: translateY(-1px);
+        }
+
+        .upload-button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .upload-button.success {
+            background: #28a745;
+        }
+
+        .workflow-status {
+            margin: 10px 0;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .workflow-status.info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+
+        .workflow-status.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+    </style>
 </head>
+
 <body>
     <div class="container">
         <main>
-            <div class="upload-section">
-                <h2>上传PDF文件</h2>
+            <!-- Step 1: Upload File -->
+            <div class="step-container active" id="uploadStep">
+                <div class="step-header">
+                    <div class="step-number">1</div>
+                    <div class="step-title">上传PDF文件</div>
+                </div>
+
                 <div class="file-upload" id="fileUpload">
                     <div class="upload-area" id="uploadArea">
                         <div class="upload-icon">📄</div>
@@ -22,167 +128,215 @@
                         <button type="button" id="removeFile">移除</button>
                     </div>
                 </div>
+
+                <div style="margin-top: 15px;">
+                    <button type="button" id="uploadBtn" class="upload-button" disabled>
+                        上传文件
+                    </button>
+                    <div class="workflow-status info" id="uploadStatus" style="display: none;">
+                        请先选择PDF文件，然后点击上传。
+                    </div>
+                </div>
             </div>
 
-            <div class="settings-section">
-                <h2>翻译设置</h2>
-                
-                <div class="settings-group">
-                    <label for="service">翻译服务：</label>
-                    <select id="service">
-                        <option value="">加载中...</option>
-                    </select>
+            <!-- Step 2: Configure and Translate -->
+            <div class="step-container" id="translateStep">
+                <div class="step-header">
+                    <div class="step-number">2</div>
+                    <div class="step-title">配置翻译参数</div>
                 </div>
 
-                <div class="engine-settings" id="engineSettings">
-                    <!-- 动态加载的服务特定设置 -->
+                <div class="workflow-status info" id="translateStatus">
+                    请先完成步骤1的文件上传。
                 </div>
 
-                <div class="settings-row">
+                <div class="settings-section">
                     <div class="settings-group">
-                        <label for="langFrom">源语言：</label>
-                        <select id="langFrom">
+                        <label for="service">翻译服务：</label>
+                        <select id="service">
                             <option value="">加载中...</option>
                         </select>
                     </div>
-                    <div class="settings-group">
-                        <label for="langTo">目标语言：</label>
-                        <select id="langTo">
-                            <option value="">加载中...</option>
-                        </select>
+
+                    <div class="engine-settings" id="engineSettings">
+                        <!-- 动态加载的服务特定设置 -->
                     </div>
+
+                    <div class="settings-row">
+                        <div class="settings-group">
+                            <label for="langFrom">源语言：</label>
+                            <select id="langFrom">
+                                <option value="">加载中...</option>
+                            </select>
+                        </div>
+                        <div class="settings-group">
+                            <label for="langTo">目标语言：</label>
+                            <select id="langTo">
+                                <option value="">加载中...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="pageRange">翻译页面：</label>
+                        <select id="pageRange">
+                            <option value="All">全部页面</option>
+                            <option value="First">仅第一页</option>
+                            <option value="First 5 pages">前5页</option>
+                            <option value="Range">自定义范围</option>
+                        </select>
+                        <input type="text" id="pageInput" placeholder="例如：1,3,5-10" style="display: none;">
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="threads">每秒请求数：</label>
+                        <input type="number" id="threads" value="4" min="1" max="20">
+                    </div>
+
+                    <details class="advanced-settings">
+                        <summary>高级选项</summary>
+
+                        <h3>PDF输出选项</h3>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" id="noMono">
+                                禁用单语输出
+                            </label>
+                            <label>
+                                <input type="checkbox" id="noDual">
+                                禁用双语输出
+                            </label>
+                            <label>
+                                <input type="checkbox" id="dualTranslateFirst">
+                                双语模式中翻译页面在前
+                            </label>
+                            <label>
+                                <input type="checkbox" id="useAlternatingPagesDual">
+                                双语PDF使用交替页面
+                            </label>
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="watermarkMode">水印模式：</label>
+                            <select id="watermarkMode">
+                                <option value="Watermarked">带水印</option>
+                                <option value="No Watermark">无水印</option>
+                            </select>
+                        </div>
+
+                        <h3>翻译选项</h3>
+                        <div class="settings-group">
+                            <label for="customSystemPrompt">自定义系统提示：</label>
+                            <textarea id="customSystemPrompt" placeholder="例如：/no_think 你是一个专业、地道的机器翻译引擎。"></textarea>
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="minTextLength">最小翻译文本长度：</label>
+                            <input type="number" id="minTextLength" value="10" min="0">
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="primaryFontFamily">主要字体系列：</label>
+                            <select id="primaryFontFamily">
+                                <option value="Auto">自动</option>
+                                <option value="serif">衬线字体</option>
+                                <option value="sans-serif">无衬线字体</option>
+                                <option value="script">手写字体</option>
+                            </select>
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="rpcDoclayout">文档布局RPC服务地址（可选）：</label>
+                            <input type="url" id="rpcDoclayout" placeholder="例如：http://localhost:8080/layout">
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="poolMaxWorkers">线程池最大工作线程数（0=自动）：</label>
+                            <input type="number" id="poolMaxWorkers" value="0" min="0">
+                        </div>
+
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" id="noAutoExtractGlossary">
+                                禁用自动术语提取
+                            </label>
+                        </div>
+
+                        <h3>PDF处理选项</h3>
+                        <div class="checkbox-group">
+                            <label>
+                                <input type="checkbox" id="skipClean">
+                                跳过清理（提高兼容性）
+                            </label>
+                            <label>
+                                <input type="checkbox" id="disableRichTextTranslate">
+                                禁用富文本翻译
+                            </label>
+                            <label>
+                                <input type="checkbox" id="enhanceCompatibility">
+                                增强兼容性
+                            </label>
+                            <label>
+                                <input type="checkbox" id="splitShortLines">
+                                强制分割短行
+                            </label>
+                            <label>
+                                <input type="checkbox" id="translateTableText">
+                                翻译表格文本（实验性）
+                            </label>
+                            <label>
+                                <input type="checkbox" id="skipScannedDetection">
+                                跳过扫描检测
+                            </label>
+                            <label>
+                                <input type="checkbox" id="ocrWorkaround">
+                                OCR解决方案（实验性）
+                            </label>
+                            <label>
+                                <input type="checkbox" id="autoEnableOcrWorkaround">
+                                自动启用OCR解决方案
+                            </label>
+                            <label>
+                                <input type="checkbox" id="ignoreCache">
+                                忽略缓存
+                            </label>
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="shortLineSplitFactor">分割阈值因子：</label>
+                            <input type="range" id="shortLineSplitFactor" min="0.1" max="1.0" step="0.1" value="0.5">
+                            <span id="shortLineSplitFactorValue">0.5</span>
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="maxPagesPerPart">每部分最大页数（0=无限制）：</label>
+                            <input type="number" id="maxPagesPerPart" value="0" min="0">
+                        </div>
+
+                        <h3>公式处理选项</h3>
+                        <div class="settings-group">
+                            <label for="formularFontPattern">公式字体模式（正则表达式）：</label>
+                            <input type="text" id="formularFontPattern" placeholder="例如：.*math.*|.*formula.*">
+                        </div>
+
+                        <div class="settings-group">
+                            <label for="formularCharPattern">公式字符模式（正则表达式）：</label>
+                            <input type="text" id="formularCharPattern" placeholder="例如：[∑∏∫∂∇∆]">
+                        </div>
+                    </details>
                 </div>
 
-                <div class="settings-group">
-                    <label for="pageRange">翻译页面：</label>
-                    <select id="pageRange">
-                        <option value="All">全部页面</option>
-                        <option value="First">仅第一页</option>
-                        <option value="First 5 pages">前5页</option>
-                        <option value="Range">自定义范围</option>
-                    </select>
-                    <input type="text" id="pageInput" placeholder="例如：1,3,5-10" style="display: none;">
+                <div class="action-section" style="margin-top: 20px;">
+                    <button type="button" id="translateBtn" class="primary-button" disabled>
+                        开始翻译
+                    </button>
+                    <button type="button" id="cancelBtn" class="secondary-button" style="display: none;">
+                        取消翻译
+                    </button>
                 </div>
-
-                <div class="settings-group">
-                    <label for="threads">每秒请求数：</label>
-                    <input type="number" id="threads" value="4" min="1" max="20">
-                </div>
-
-                <details class="advanced-settings">
-                    <summary>高级选项</summary>
-                    
-                    <h3>PDF输出选项</h3>
-                    <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" id="noMono">
-                            禁用单语输出
-                        </label>
-                        <label>
-                            <input type="checkbox" id="noDual">
-                            禁用双语输出
-                        </label>
-                        <label>
-                            <input type="checkbox" id="dualTranslateFirst">
-                            双语模式中翻译页面在前
-                        </label>
-                        <label>
-                            <input type="checkbox" id="useAlternatingPagesDual">
-                            双语PDF使用交替页面
-                        </label>
-                    </div>
-
-                    <div class="settings-group">
-                        <label for="watermarkMode">水印模式：</label>
-                        <select id="watermarkMode">
-                            <option value="Watermarked">带水印</option>
-                            <option value="No Watermark">无水印</option>
-                        </select>
-                    </div>
-
-                    <h3>翻译选项</h3>
-                    <div class="settings-group">
-                        <label for="customSystemPrompt">自定义系统提示：</label>
-                        <textarea id="customSystemPrompt" placeholder="例如：/no_think 你是一个专业、地道的机器翻译引擎。"></textarea>
-                    </div>
-
-                    <div class="settings-group">
-                        <label for="minTextLength">最小翻译文本长度：</label>
-                        <input type="number" id="minTextLength" value="10" min="0">
-                    </div>
-
-                    <div class="settings-group">
-                        <label for="primaryFontFamily">主要字体系列：</label>
-                        <select id="primaryFontFamily">
-                            <option value="Auto">自动</option>
-                            <option value="serif">衬线字体</option>
-                            <option value="sans-serif">无衬线字体</option>
-                            <option value="script">手写字体</option>
-                        </select>
-                    </div>
-
-                    <h3>PDF处理选项</h3>
-                    <div class="checkbox-group">
-                        <label>
-                            <input type="checkbox" id="skipClean">
-                            跳过清理（提高兼容性）
-                        </label>
-                        <label>
-                            <input type="checkbox" id="disableRichTextTranslate">
-                            禁用富文本翻译
-                        </label>
-                        <label>
-                            <input type="checkbox" id="enhanceCompatibility">
-                            增强兼容性
-                        </label>
-                        <label>
-                            <input type="checkbox" id="splitShortLines">
-                            强制分割短行
-                        </label>
-                        <label>
-                            <input type="checkbox" id="translateTableText" checked>
-                            翻译表格文本（实验性）
-                        </label>
-                        <label>
-                            <input type="checkbox" id="skipScannedDetection">
-                            跳过扫描检测
-                        </label>
-                        <label>
-                            <input type="checkbox" id="ocrWorkaround">
-                            OCR解决方案（实验性）
-                        </label>
-                        <label>
-                            <input type="checkbox" id="autoEnableOcrWorkaround" checked>
-                            自动启用OCR解决方案
-                        </label>
-                        <label>
-                            <input type="checkbox" id="ignoreCache">
-                            忽略缓存
-                        </label>
-                    </div>
-
-                    <div class="settings-group">
-                        <label for="shortLineSplitFactor">分割阈值因子：</label>
-                        <input type="range" id="shortLineSplitFactor" min="0.1" max="1.0" step="0.1" value="0.5">
-                        <span id="shortLineSplitFactorValue">0.5</span>
-                    </div>
-
-                    <div class="settings-group">
-                        <label for="maxPagesPerPart">每部分最大页数（0=无限制）：</label>
-                        <input type="number" id="maxPagesPerPart" value="0" min="0">
-                    </div>
-                </details>
             </div>
 
-            <div class="action-section">
-                <button type="button" id="translateBtn" class="primary-button" disabled>
-                    开始翻译
-                </button>
-                <button type="button" id="cancelBtn" class="secondary-button" style="display: none;">
-                    取消翻译
-                </button>
-            </div>
-
+            <!-- Step 3: Progress and Results -->
             <div class="progress-section" id="progressSection" style="display: none;">
                 <h2>翻译进度</h2>
                 <div class="progress-bar">
@@ -207,6 +361,16 @@
         </main>
     </div>
 
-    <script src="/static/script.js"></script>
+    <script>
+        console.log('🔍 Inline script loaded');
+        // Test if basic DOM works
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🔍 Inline DOMContentLoaded fired');
+            const testBtn = document.getElementById('uploadBtn');
+            console.log('🔍 uploadBtn from inline script:', testBtn);
+        });
+    </script>
+    <script src="/static/script.js?v=3"></script>
 </body>
+
 </html>

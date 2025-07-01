@@ -174,3 +174,16 @@ uv.lock
 *.docx
 .env
 .env.*
+
+# OS files
+Thumbs.db
+*.tmp
+
+# Editor files
+*.swp
+*.swo
+*~
+
+# Output directories
+output/
+results/

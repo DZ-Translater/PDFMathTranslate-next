@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDFMathTranslate - PDF文档翻译服务</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <main>
+            <div class="upload-section">
+                <h2>上传PDF文件</h2>
+                <div class="file-upload" id="fileUpload">
+                    <div class="upload-area" id="uploadArea">
+                        <div class="upload-icon">📄</div>
+                        <p>点击上传或拖拽PDF文件至此处</p>
+                        <input type="file" id="fileInput" accept=".pdf" hidden>
+                    </div>
+                    <div class="file-info" id="fileInfo" style="display: none;">
+                        <span id="fileName"></span>
+                        <button type="button" id="removeFile">移除</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h2>翻译设置</h2>
+                
+                <div class="settings-group">
+                    <label for="service">翻译服务：</label>
+                    <select id="service">
+                        <option value="">加载中...</option>
+                    </select>
+                </div>
+
+                <div class="engine-settings" id="engineSettings">
+                    <!-- 动态加载的服务特定设置 -->
+                </div>
+
+                <div class="settings-row">
+                    <div class="settings-group">
+                        <label for="langFrom">源语言：</label>
+                        <select id="langFrom">
+                            <option value="">加载中...</option>
+                        </select>
+                    </div>
+                    <div class="settings-group">
+                        <label for="langTo">目标语言：</label>
+                        <select id="langTo">
+                            <option value="">加载中...</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="settings-group">
+                    <label for="pageRange">翻译页面：</label>
+                    <select id="pageRange">
+                        <option value="All">全部页面</option>
+                        <option value="First">仅第一页</option>
+                        <option value="First 5 pages">前5页</option>
+                        <option value="Range">自定义范围</option>
+                    </select>
+                    <input type="text" id="pageInput" placeholder="例如：1,3,5-10" style="display: none;">
+                </div>
+
+                <div class="settings-group">
+                    <label for="threads">每秒请求数：</label>
+                    <input type="number" id="threads" value="4" min="1" max="20">
+                </div>
+
+                <details class="advanced-settings">
+                    <summary>高级选项</summary>
+                    
+                    <h3>PDF输出选项</h3>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="noMono">
+                            禁用单语输出
+                        </label>
+                        <label>
+                            <input type="checkbox" id="noDual">
+                            禁用双语输出
+                        </label>
+                        <label>
+                            <input type="checkbox" id="dualTranslateFirst">
+                            双语模式中翻译页面在前
+                        </label>
+                        <label>
+                            <input type="checkbox" id="useAlternatingPagesDual">
+                            双语PDF使用交替页面
+                        </label>
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="watermarkMode">水印模式：</label>
+                        <select id="watermarkMode">
+                            <option value="Watermarked">带水印</option>
+                            <option value="No Watermark">无水印</option>
+                        </select>
+                    </div>
+
+                    <h3>翻译选项</h3>
+                    <div class="settings-group">
+                        <label for="customSystemPrompt">自定义系统提示：</label>
+                        <textarea id="customSystemPrompt" placeholder="例如：/no_think 你是一个专业、地道的机器翻译引擎。"></textarea>
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="minTextLength">最小翻译文本长度：</label>
+                        <input type="number" id="minTextLength" value="10" min="0">
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="primaryFontFamily">主要字体系列：</label>
+                        <select id="primaryFontFamily">
+                            <option value="Auto">自动</option>
+                            <option value="serif">衬线字体</option>
+                            <option value="sans-serif">无衬线字体</option>
+                            <option value="script">手写字体</option>
+                        </select>
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="rpcDoclayout">文档布局RPC服务地址（可选）：</label>
+                        <input type="url" id="rpcDoclayout" placeholder="例如：http://localhost:8080/layout">
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="poolMaxWorkers">线程池最大工作线程数（0=自动）：</label>
+                        <input type="number" id="poolMaxWorkers" value="0" min="0">
+                    </div>
+
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="noAutoExtractGlossary">
+                            禁用自动术语提取
+                        </label>
+                    </div>
+
+                    <h3>PDF处理选项</h3>
+                    <div class="checkbox-group">
+                        <label>
+                            <input type="checkbox" id="skipClean">
+                            跳过清理（提高兼容性）
+                        </label>
+                        <label>
+                            <input type="checkbox" id="disableRichTextTranslate">
+                            禁用富文本翻译
+                        </label>
+                        <label>
+                            <input type="checkbox" id="enhanceCompatibility">
+                            增强兼容性
+                        </label>
+                        <label>
+                            <input type="checkbox" id="splitShortLines">
+                            强制分割短行
+                        </label>
+                        <label>
+                            <input type="checkbox" id="translateTableText">
+                            翻译表格文本（实验性）
+                        </label>
+                        <label>
+                            <input type="checkbox" id="skipScannedDetection">
+                            跳过扫描检测
+                        </label>
+                        <label>
+                            <input type="checkbox" id="ocrWorkaround">
+                            OCR解决方案（实验性）
+                        </label>
+                        <label>
+                            <input type="checkbox" id="autoEnableOcrWorkaround">
+                            自动启用OCR解决方案
+                        </label>
+                        <label>
+                            <input type="checkbox" id="ignoreCache">
+                            忽略缓存
+                        </label>
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="shortLineSplitFactor">分割阈值因子：</label>
+                        <input type="range" id="shortLineSplitFactor" min="0.1" max="1.0" step="0.1" value="0.5">
+                        <span id="shortLineSplitFactorValue">0.5</span>
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="maxPagesPerPart">每部分最大页数（0=无限制）：</label>
+                        <input type="number" id="maxPagesPerPart" value="0" min="0">
+                    </div>
+
+                    <h3>公式处理选项</h3>
+                    <div class="settings-group">
+                        <label for="formularFontPattern">公式字体模式（正则表达式）：</label>
+                        <input type="text" id="formularFontPattern" placeholder="例如：.*math.*|.*formula.*">
+                    </div>
+
+                    <div class="settings-group">
+                        <label for="formularCharPattern">公式字符模式（正则表达式）：</label>
+                        <input type="text" id="formularCharPattern" placeholder="例如：[∑∏∫∂∇∆]">
+                    </div>
+                </details>
+            </div>
+
+            <div class="action-section">
+                <button type="button" id="translateBtn" class="primary-button" disabled>
+                    开始翻译
+                </button>
+                <button type="button" id="cancelBtn" class="secondary-button" style="display: none;">
+                    取消翻译
+                </button>
+            </div>
+
+            <div class="progress-section" id="progressSection" style="display: none;">
+                <h2>翻译进度</h2>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <p class="progress-text" id="progressText">开始翻译中...</p>
+                <div class="progress-details" id="progressDetails"></div>
+            </div>
+
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <h2>翻译结果</h2>
+                <div class="download-buttons">
+                    <button type="button" id="downloadMono" class="download-button" style="display: none;">
+                        下载单语PDF
+                    </button>
+                    <button type="button" id="downloadDual" class="download-button" style="display: none;">
+                        下载双语PDF
+                    </button>
+                </div>
+                <div class="translation-stats" id="translationStats"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/static/script.js?v=2"></script>
+</body>
+</html>
