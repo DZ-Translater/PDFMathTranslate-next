@@ -25,6 +25,7 @@ from pdf2zh_next.config import ConfigManager
 from pdf2zh_next.config.cli_env_model import CLIEnvSettingsModel
 from pdf2zh_next.config.model import SettingsModel
 from pdf2zh_next.high_level import do_translate_async_stream
+from pdf2zh_next.storage import upload_to_storage
 from pydantic import BaseModel, Field, field_validator
 
 # Configure logging
@@ -627,6 +628,35 @@ async def _translation_task(task_id: str, settings: SettingsModel, file_path: Pa
                 )
             elif event["type"] == "finish":
                 result = event["translate_result"]
+                
+                # Upload files to object storage
+                storage_results = {}
+                try:
+                    # Upload mono PDF if exists
+                    if result.mono_pdf_path and Path(result.mono_pdf_path).exists():
+                        logger.info(f"Uploading mono PDF to object storage: {result.mono_pdf_path}")
+                        mono_storage = await upload_to_storage(Path(result.mono_pdf_path))
+                        if mono_storage:
+                            storage_results["mono"] = {
+                                "access_url": mono_storage["access_url"],
+                                "file_hash": mono_storage["file_hash"],
+                                "storage_key": mono_storage["storage_key"]
+                            }
+                    
+                    # Upload dual PDF if exists
+                    if result.dual_pdf_path and Path(result.dual_pdf_path).exists():
+                        logger.info(f"Uploading dual PDF to object storage: {result.dual_pdf_path}")
+                        dual_storage = await upload_to_storage(Path(result.dual_pdf_path))
+                        if dual_storage:
+                            storage_results["dual"] = {
+                                "access_url": dual_storage["access_url"],
+                                "file_hash": dual_storage["file_hash"],
+                                "storage_key": dual_storage["storage_key"]
+                            }
+                except Exception as e:
+                    logger.error(f"Failed to upload files to storage: {e}")
+                    # Continue even if upload fails, local files are still available
+                
                 task_results[task_id].update(
                     {
                         "status": "completed",
@@ -636,6 +666,7 @@ async def _translation_task(task_id: str, settings: SettingsModel, file_path: Pa
                             "mono_pdf_path": str(result.mono_pdf_path) if result.mono_pdf_path else None,
                             "dual_pdf_path": str(result.dual_pdf_path) if result.dual_pdf_path else None,
                             "total_seconds": result.total_seconds,
+                            "storage": storage_results,  # Add storage results
                         },
                     }
                 )
