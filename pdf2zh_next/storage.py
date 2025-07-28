@@ -2,31 +2,26 @@
 Object storage integration for PDFMathTranslate
 """
 
-import asyncio
 import hashlib
 import logging
+import os
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-from typing import Dict
-from typing import Optional
 
 import aiohttp
 
 logger = logging.getLogger(__name__)
 
 
-import os
-
-
 @dataclass
 class StorageConfig:
     """Storage service configuration"""
 
-    api_base_url: str = os.getenv("STORAGE_API_URL", "https://api.by.dianzhantech.com")
-    auth_token: str = os.getenv("STORAGE_API_TOKEN", "dz-trans-mE4DteHGfra1TJlIwF1U9rXYsURZPcPe")
     enabled: bool = os.getenv("ENABLE_OBJECT_STORAGE", "true").lower() == "true"
+    api_base_url: str = os.getenv("STORAGE_API_URL", "")
+    auth_token: str = os.getenv("STORAGE_API_TOKEN", "")
 
 
 @dataclass
@@ -43,9 +38,9 @@ class PresignedUrlResponse:
 class ObjectStorageClient:
     """Client for interacting with object storage service"""
 
-    def __init__(self, config: Optional[StorageConfig] = None):
+    def __init__(self, config: StorageConfig | None = None):
         self.config = config or StorageConfig()
-        self._session: Optional[aiohttp.ClientSession] = None
+        self._session: aiohttp.ClientSession | None = None
 
     async def __aenter__(self):
         self._session = aiohttp.ClientSession()
@@ -64,7 +59,7 @@ class ObjectStorageClient:
     def _calculate_file_hash(self, file_path: Path) -> str:
         """Calculate SHA256 hash of file content"""
         sha256_hash = hashlib.sha256()
-        with open(file_path, "rb") as f:
+        with Path.open(file_path, "rb") as f:
             for byte_block in iter(lambda: f.read(4096), b""):
                 sha256_hash.update(byte_block)
         return sha256_hash.hexdigest()
@@ -99,21 +94,17 @@ class ObjectStorageClient:
 
     async def upload_file(self, file_path: Path, presigned_url: str) -> None:
         """Upload file to presigned URL"""
-        with open(file_path, "rb") as f:
+        with Path.open(file_path, "rb") as f:
             file_data = f.read()
 
         # Important: Skip auto headers to avoid signature mismatch
         # aiohttp may auto-add Content-Type which breaks presigned URL signatures
-        async with self.session.put(
-            presigned_url, 
-            data=file_data,
-            skip_auto_headers=['Content-Type']
-        ) as response:
+        async with self.session.put(presigned_url, data=file_data, skip_auto_headers=["Content-Type"]) as response:
             if response.status not in (200, 201, 204):
                 error_text = await response.text()
                 raise Exception(f"Failed to upload file: {response.status} - {error_text}")
 
-    async def upload_pdf_with_hash(self, file_path: Path) -> Dict[str, Any]:
+    async def upload_pdf_with_hash(self, file_path: Path) -> dict[str, Any]:
         """
         Upload PDF file to object storage using content hash as key
 
@@ -135,7 +126,7 @@ class ObjectStorageClient:
 
         # Upload file
         await self.upload_file(file_path, presigned_response.presigned_url)
-        logger.info(f"File uploaded successfully")
+        logger.info("File uploaded successfully")
 
         return {
             "file_hash": file_hash,
@@ -147,10 +138,10 @@ class ObjectStorageClient:
 
 
 # Storage cache to track uploaded files by hash
-_storage_cache: Dict[str, Dict[str, Any]] = {}
+_storage_cache: dict[str, dict[str, Any]] = {}
 
 
-async def upload_to_storage(file_path: Path) -> Optional[Dict[str, Any]]:
+async def upload_to_storage(file_path: Path) -> dict[str, Any] | None:
     """
     Upload file to object storage with deduplication
 
@@ -167,7 +158,7 @@ async def upload_to_storage(file_path: Path) -> Optional[Dict[str, Any]]:
 
         # Check if file already uploaded
         if file_hash in _storage_cache:
-            logger.info(f"File already uploaded, reusing existing URL")
+            logger.info("File already uploaded, reusing existing URL")
             return _storage_cache[file_hash]
 
         # Upload new file
