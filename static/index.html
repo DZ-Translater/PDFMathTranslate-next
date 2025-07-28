@@ -175,92 +175,38 @@
                                 <option value="">加载中...</option>
                             </select>
                         </div>
+                        <div class="settings-group">
+                            <label for="pageRange">翻译页面：</label>
+                            <select id="pageRange">
+                                <option value="All">全部页面</option>
+                                <option value="First">仅第一页</option>
+                                <option value="First 5 pages">前5页</option>
+                                <option value="Range">自定义范围</option>
+                            </select>
+                            <input type="text" id="pageInput" placeholder="例如：1,3,5-10" style="display: none; margin-left: 10px;">
+                        </div>
                     </div>
 
-                    <div class="settings-group">
-                        <label for="pageRange">翻译页面：</label>
-                        <select id="pageRange">
-                            <option value="All">全部页面</option>
-                            <option value="First">仅第一页</option>
-                            <option value="First 5 pages">前5页</option>
-                            <option value="Range">自定义范围</option>
-                        </select>
-                        <input type="text" id="pageInput" placeholder="例如：1,3,5-10" style="display: none;">
-                    </div>
-
-                    <div class="settings-group">
-                        <label for="threads">每秒请求数：</label>
-                        <input type="number" id="threads" value="4" min="1" max="20">
-                    </div>
+                    <!-- Hidden threads input with default value 10 -->
+                    <input type="hidden" id="threads" value="10">
 
                     <details class="advanced-settings">
                         <summary>高级选项</summary>
 
-                        <h3>PDF输出选项</h3>
-                        <div class="checkbox-group">
-                            <label>
-                                <input type="checkbox" id="noMono">
-                                禁用单语输出
-                            </label>
-                            <label>
-                                <input type="checkbox" id="noDual">
-                                禁用双语输出
-                            </label>
-                            <label>
-                                <input type="checkbox" id="dualTranslateFirst">
-                                双语模式中翻译页面在前
-                            </label>
-                            <label>
-                                <input type="checkbox" id="useAlternatingPagesDual">
-                                双语PDF使用交替页面
-                            </label>
-                        </div>
+                        <!-- Hidden PDF output options -->
+                        <input type="hidden" id="noMono" value="false">
+                        <input type="hidden" id="noDual" value="false">
+                        <input type="hidden" id="dualTranslateFirst" value="false">
+                        <input type="hidden" id="useAlternatingPagesDual" value="false">
+                        <input type="hidden" id="watermarkMode" value="No Watermark">
 
-                        <div class="settings-group">
-                            <label for="watermarkMode">水印模式：</label>
-                            <select id="watermarkMode">
-                                <option value="Watermarked">带水印</option>
-                                <option value="No Watermark">无水印</option>
-                            </select>
-                        </div>
-
-                        <h3>翻译选项</h3>
-                        <div class="settings-group">
-                            <label for="customSystemPrompt">自定义系统提示：</label>
-                            <textarea id="customSystemPrompt" placeholder="例如：/no_think 你是一个专业、地道的机器翻译引擎。"></textarea>
-                        </div>
-
-                        <div class="settings-group">
-                            <label for="minTextLength">最小翻译文本长度：</label>
-                            <input type="number" id="minTextLength" value="10" min="0">
-                        </div>
-
-                        <div class="settings-group">
-                            <label for="primaryFontFamily">主要字体系列：</label>
-                            <select id="primaryFontFamily">
-                                <option value="Auto">自动</option>
-                                <option value="serif">衬线字体</option>
-                                <option value="sans-serif">无衬线字体</option>
-                                <option value="script">手写字体</option>
-                            </select>
-                        </div>
-
-                        <div class="settings-group">
-                            <label for="rpcDoclayout">文档布局RPC服务地址（可选）：</label>
-                            <input type="url" id="rpcDoclayout" placeholder="例如：http://localhost:8080/layout">
-                        </div>
-
-                        <div class="settings-group">
-                            <label for="poolMaxWorkers">线程池最大工作线程数（0=自动）：</label>
-                            <input type="number" id="poolMaxWorkers" value="0" min="0">
-                        </div>
-
-                        <div class="checkbox-group">
-                            <label>
-                                <input type="checkbox" id="noAutoExtractGlossary">
-                                禁用自动术语提取
-                            </label>
-                        </div>
+                        <!-- Hidden translation options -->
+                        <input type="hidden" id="customSystemPrompt" value="">
+                        <input type="hidden" id="minTextLength" value="10">
+                        <input type="hidden" id="primaryFontFamily" value="Auto">
+                        <input type="hidden" id="rpcDoclayout" value="">
+                        <input type="hidden" id="poolMaxWorkers" value="0">
+                        <input type="hidden" id="noAutoExtractGlossary" value="true">
 
                         <h3>PDF处理选项</h3>
                         <div class="checkbox-group">
@@ -281,7 +227,7 @@
                                 强制分割短行
                             </label>
                             <label>
-                                <input type="checkbox" id="translateTableText">
+                                <input type="checkbox" id="translateTableText" checked>
                                 翻译表格文本（实验性）
                             </label>
                             <label>
@@ -302,27 +248,13 @@
                             </label>
                         </div>
 
-                        <div class="settings-group">
-                            <label for="shortLineSplitFactor">分割阈值因子：</label>
-                            <input type="range" id="shortLineSplitFactor" min="0.1" max="1.0" step="0.1" value="0.5">
-                            <span id="shortLineSplitFactorValue">0.5</span>
-                        </div>
+                        <!-- Hidden split factor and max pages settings -->
+                        <input type="hidden" id="shortLineSplitFactor" value="0.5">
+                        <input type="hidden" id="maxPagesPerPart" value="0">
 
-                        <div class="settings-group">
-                            <label for="maxPagesPerPart">每部分最大页数（0=无限制）：</label>
-                            <input type="number" id="maxPagesPerPart" value="0" min="0">
-                        </div>
-
-                        <h3>公式处理选项</h3>
-                        <div class="settings-group">
-                            <label for="formularFontPattern">公式字体模式（正则表达式）：</label>
-                            <input type="text" id="formularFontPattern" placeholder="例如：.*math.*|.*formula.*">
-                        </div>
-
-                        <div class="settings-group">
-                            <label for="formularCharPattern">公式字符模式（正则表达式）：</label>
-                            <input type="text" id="formularCharPattern" placeholder="例如：[∑∏∫∂∇∆]">
-                        </div>
+                        <!-- Hidden formula processing options -->
+                        <input type="hidden" id="formularFontPattern" value="">
+                        <input type="hidden" id="formularCharPattern" value="">
                     </details>
                 </div>
 

@@ -41,6 +41,12 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('fileInput element:', fileInput);
     console.log('uploadArea element:', uploadArea);
     
+    // Ensure engine settings are hidden from the start
+    if (engineSettings) {
+        engineSettings.style.display = 'none';
+        engineSettings.innerHTML = '';
+    }
+    
     initializeApp();
     setupEventListeners();
 });
@@ -164,6 +170,9 @@ function handleFile(file) {
     currentFileId = null;
     translateBtn.disabled = true;
     resetTranslationUI();
+    
+    // Auto upload the file
+    uploadFile();
 }
 
 function removeFile() {
@@ -231,97 +240,22 @@ function populateServiceSelect() {
         serviceSelect.appendChild(option);
     });
     
-    if (availableServices.length > 0) {
+    // Set default to gpt-4o-mini if available, otherwise use first service
+    const defaultService = availableServices.find(s => s.name === 'gpt-4o-mini');
+    if (defaultService) {
+        serviceSelect.value = 'gpt-4o-mini';
+    } else if (availableServices.length > 0) {
         serviceSelect.value = availableServices[0].name;
-        updateEngineSettings();
     }
+    updateEngineSettings();
 }
 
 function updateEngineSettings() {
-    const selectedService = availableServices.find(s => s.name === serviceSelect.value);
+    // Clear engine settings and hide the section
     engineSettings.innerHTML = '';
+    engineSettings.style.display = 'none';
     
-    if (selectedService && selectedService.fields.length > 0) {
-        engineSettings.style.display = 'block';
-        
-        const title = document.createElement('h3');
-        title.textContent = `${selectedService.name} 配置`;
-        engineSettings.appendChild(title);
-        
-        selectedService.fields.forEach(field => {
-            const group = document.createElement('div');
-            group.className = 'settings-group';
-            
-            const label = document.createElement('label');
-            label.textContent = field.description;
-            label.setAttribute('for', field.name);
-            
-            let input;
-            
-            if (field.name === 'env_status') {
-                // Special handling for environment variable status
-                const statusDiv = document.createElement('div');
-                statusDiv.className = 'env-status';
-                
-                const envStatus = field.default || {};
-                Object.entries(envStatus).forEach(([envVar, isSet]) => {
-                    const statusItem = document.createElement('div');
-                    statusItem.className = `env-item ${isSet ? 'env-success' : 'env-warning'}`;
-                    statusItem.innerHTML = `
-                        <span class="env-var">${envVar}</span>: 
-                        <span class="env-value">${isSet ? '✅ 已配置' : '❌ 未配置'}</span>
-                    `;
-                    statusDiv.appendChild(statusItem);
-                });
-                
-                if (Object.values(envStatus).some(v => !v)) {
-                    const warning = document.createElement('div');
-                    warning.className = 'env-warning';
-                    warning.textContent = '⚠️ 请通过环境变量配置API密钥和Base URL';
-                    statusDiv.appendChild(warning);
-                }
-                
-                group.appendChild(label);
-                group.appendChild(statusDiv);
-            } else if (field.readonly) {
-                // Read-only field
-                input = document.createElement('input');
-                input.type = 'text';
-                input.value = field.default || '';
-                input.readOnly = true;
-                input.className = 'readonly-input';
-                input.id = field.name;
-                input.name = field.name;
-                
-                group.appendChild(label);
-                group.appendChild(input);
-            } else {
-                // Regular input field
-                if (field.type.includes('bool')) {
-                    input = document.createElement('input');
-                    input.type = 'checkbox';
-                    input.checked = field.default === true || field.default === 'true';
-                } else {
-                    input = document.createElement('input');
-                    input.type = field.is_password ? 'password' : 'text';
-                    input.value = field.default || '';
-                    if (field.type.includes('int')) {
-                        input.type = 'number';
-                    }
-                }
-                
-                input.id = field.name;
-                input.name = field.name;
-                
-                group.appendChild(label);
-                group.appendChild(input);
-            }
-            
-            engineSettings.appendChild(group);
-        });
-    } else {
-        engineSettings.style.display = 'none';
-    }
+    // No longer display service-specific configuration
 }
 
 function togglePageInput() {
@@ -439,10 +373,10 @@ function collectTranslationSettings() {
         page_range: pageRangeSelect.value,
         page_input: pageInput.value.trim() || null,
         threads: parseInt(document.getElementById('threads').value),
-        no_mono: document.getElementById('noMono').checked,
-        no_dual: document.getElementById('noDual').checked,
-        dual_translate_first: document.getElementById('dualTranslateFirst').checked,
-        use_alternating_pages_dual: document.getElementById('useAlternatingPagesDual').checked,
+        no_mono: document.getElementById('noMono').value === 'true',
+        no_dual: document.getElementById('noDual').value === 'true',
+        dual_translate_first: document.getElementById('dualTranslateFirst').value === 'true',
+        use_alternating_pages_dual: document.getElementById('useAlternatingPagesDual').value === 'true',
         watermark_output_mode: document.getElementById('watermarkMode').value,
         custom_system_prompt_input: document.getElementById('customSystemPrompt').value || null,
         min_text_length: parseInt(document.getElementById('minTextLength').value) || 10,
@@ -451,7 +385,7 @@ function collectTranslationSettings() {
             const value = parseInt(document.getElementById('poolMaxWorkers').value);
             return value > 0 ? value : null;
         })(),
-        no_auto_extract_glossary: document.getElementById('noAutoExtractGlossary').checked,
+        no_auto_extract_glossary: document.getElementById('noAutoExtractGlossary').value === 'true',
         primary_font_family: document.getElementById('primaryFontFamily').value,
         skip_clean: document.getElementById('skipClean').checked,
         disable_rich_text_translate: document.getElementById('disableRichTextTranslate').checked,
@@ -563,20 +497,39 @@ function showResults(status) {
     resultsSection.style.display = 'block';
     resultsSection.classList.add('fade-in');
     
-    // Configure download buttons
+    // Configure download buttons with storage URLs if available
     if (result.mono_pdf_path) {
         downloadMono.style.display = 'inline-block';
+        // Store storage URL if available
+        if (result.storage && result.storage.mono && result.storage.mono.access_url) {
+            downloadMono.dataset.storageUrl = result.storage.mono.access_url;
+            downloadMono.dataset.downloadType = 'storage';
+        } else {
+            downloadMono.dataset.downloadType = 'api';
+        }
     }
     if (result.dual_pdf_path) {
         downloadDual.style.display = 'inline-block';
+        // Store storage URL if available
+        if (result.storage && result.storage.dual && result.storage.dual.access_url) {
+            downloadDual.dataset.storageUrl = result.storage.dual.access_url;
+            downloadDual.dataset.downloadType = 'storage';
+        } else {
+            downloadDual.dataset.downloadType = 'api';
+        }
     }
     
-    // Show stats
+    // Show stats with storage info
+    const storageInfo = result.storage ? 
+        `<p class="storage-info">✅ 文件已上传到云存储，可快速下载</p>` : 
+        '<p class="storage-info warning">⚠️ 使用本地下载（可能较慢）</p>';
+    
     translationStats.innerHTML = `
         <h4>翻译完成！</h4>
         <p><strong>处理时间：</strong> ${result.total_seconds.toFixed(2)} 秒</p>
         <p><strong>单语PDF：</strong> ${result.mono_pdf_path ? '可下载' : '未生成'}</p>
         <p><strong>双语PDF：</strong> ${result.dual_pdf_path ? '可下载' : '未生成'}</p>
+        ${storageInfo}
     `;
     
     // Hide progress and reset UI
@@ -590,20 +543,38 @@ async function downloadFile(fileType) {
     if (!currentTaskId) return;
     
     try {
-        const response = await fetch(`/api/task/${currentTaskId}/download/${fileType}`);
-        if (!response.ok) {
-            throw new Error('下载失败');
-        }
+        const button = fileType === 'mono' ? downloadMono : downloadDual;
+        const downloadType = button.dataset.downloadType;
         
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `translated_${fileType}_${currentTaskId}.pdf`;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
+        if (downloadType === 'storage' && button.dataset.storageUrl) {
+            // Direct download from object storage
+            const storageUrl = button.dataset.storageUrl;
+            const a = document.createElement('a');
+            a.href = storageUrl;
+            a.download = `translated_${fileType}_${currentTaskId}.pdf`;
+            a.target = '_blank'; // Open in new tab for better compatibility
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            showSuccess('正在从云存储下载，速度更快！');
+        } else {
+            // Fallback to API download
+            const response = await fetch(`/api/task/${currentTaskId}/download/${fileType}`);
+            if (!response.ok) {
+                throw new Error('下载失败');
+            }
+            
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `translated_${fileType}_${currentTaskId}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        }
     } catch (error) {
         console.error('Download error:', error);
         showError('下载失败，请重试。');
@@ -618,6 +589,12 @@ function resetTranslationUI() {
     resultsSection.style.display = 'none';
     downloadMono.style.display = 'none';
     downloadDual.style.display = 'none';
+    
+    // Clear download button data attributes
+    downloadMono.removeAttribute('data-storage-url');
+    downloadMono.removeAttribute('data-download-type');
+    downloadDual.removeAttribute('data-storage-url');
+    downloadDual.removeAttribute('data-download-type');
     
     if (statusPollingInterval) {
         clearInterval(statusPollingInterval);

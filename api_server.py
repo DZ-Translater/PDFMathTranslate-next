@@ -115,8 +115,8 @@ class TranslationRequest(BaseModel):
     """
 
     # Translation service settings
-    service: str = "claude-sonnet-4-20250514"
-    """翻译服务选择。可选值：claude-sonnet-4-20250514, gpt-4o-mini, claude-3-5-sonnet-20240620"""
+    service: str = "gpt-4o-mini"
+    """翻译服务选择。可选值：gpt-4o-mini, claude-sonnet-4-20250514, claude-3-5-sonnet-20240620"""
 
     lang_from: str = "English"
     """源语言。支持的语言请参考 /api/languages 接口"""
@@ -290,12 +290,17 @@ async def get_services() -> list[ServiceInfo]:
     # Define supported models and their configurations
     supported_models = [
         {
+            "name": "gpt-4o-mini",
+            "display_name": "GPT-4o Mini",
+            "service_type": "OpenAI",
+            "env_vars": ["OPENAI_API_KEY", "OPENAI_BASE_URL"],
+        },
+        {
             "name": "claude-sonnet-4-20250514",
             "display_name": "Claude Sonnet 4",
             "service_type": "Anthropic",  # Using OpenAI-compatible API
             "env_vars": ["ANTHROPIC_API_KEY", "ANTHROPIC_BASE_URL"],
         },
-        {"name": "gpt-4o-mini", "display_name": "GPT-4o Mini", "service_type": "OpenAI", "env_vars": ["OPENAI_API_KEY", "OPENAI_BASE_URL"]},
         {
             "name": "claude-3-5-sonnet-20240620",
             "display_name": "Claude 3.5 Sonnet",
