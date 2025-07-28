@@ -467,14 +467,31 @@ function startStatusPolling() {
 function updateProgress(status) {
     const progress = status.progress || 0;
     progressFill.style.width = `${progress}%`;
-    progressText.textContent = status.stage || '处理中...';
     
-    if (status.part_index && status.total_parts) {
-        progressDetails.textContent = `第${status.part_index}/${status.total_parts}部分`;
-        if (status.stage_current && status.stage_total) {
-            progressDetails.textContent += ` - 第${status.stage_current}/${status.stage_total}步`;
-        }
+    // Display stage message with more details
+    let stageText = status.stage || '处理中...';
+    
+    // Add stage progress if available
+    if (status.stage_current && status.stage_total) {
+        stageText += ` (${status.stage_current}/${status.stage_total})`;
     }
+    
+    progressText.textContent = stageText;
+    
+    // Display additional details
+    let detailsText = '';
+    
+    if (status.part_index && status.total_parts && status.total_parts > 1) {
+        detailsText = `第${status.part_index}/${status.total_parts}部分`;
+    }
+    
+    // Add percentage
+    if (progress > 0) {
+        const percentText = `${progress.toFixed(1)}%`;
+        detailsText = detailsText ? `${detailsText} - ${percentText}` : percentText;
+    }
+    
+    progressDetails.textContent = detailsText;
 }
 
 async function cancelTranslation() {

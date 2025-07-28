@@ -356,12 +356,14 @@ input[type="range"] {
     color: var(--primary-color);
     text-align: center;
     margin-bottom: 0.5rem;
+    font-size: 1.1rem;
 }
 
 .progress-details {
-    font-size: 0.9rem;
-    color: #666;
+    font-size: 0.95rem;
+    color: #555;
     text-align: center;
+    font-weight: 500;
 }
 
 /* Results section */
