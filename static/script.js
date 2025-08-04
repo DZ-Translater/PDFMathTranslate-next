@@ -389,7 +389,7 @@ function collectTranslationSettings() {
         primary_font_family: document.getElementById('primaryFontFamily').value,
         skip_clean: document.getElementById('skipClean').checked,
         disable_rich_text_translate: document.getElementById('disableRichTextTranslate').checked,
-        enhance_compatibility: document.getElementById('enhanceCompatibility').checked,
+        enhance_compatibility: false, // Always false due to known issues
         split_short_lines: document.getElementById('splitShortLines').checked,
         short_line_split_factor: parseFloat(document.getElementById('shortLineSplitFactor').value),
         translate_table_text: document.getElementById('translateTableText').checked,

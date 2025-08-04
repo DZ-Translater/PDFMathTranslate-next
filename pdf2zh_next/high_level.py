@@ -12,9 +12,9 @@ from functools import partial
 from logging.handlers import QueueHandler
 from pathlib import Path
 
-from babeldoc.high_level import async_translate as babeldoc_translate
-from babeldoc.translation_config import TranslationConfig as BabelDOCConfig
-from babeldoc.translation_config import (
+from babeldoc.format.pdf.high_level import async_translate as babeldoc_translate
+from babeldoc.format.pdf.translation_config import TranslationConfig as BabelDOCConfig
+from babeldoc.format.pdf.translation_config import (
     WatermarkOutputMode as BabelDOCWatermarkMode,
 )
 from babeldoc.glossary import Glossary
@@ -25,6 +25,14 @@ from pdf2zh_next.config.model import SettingsModel
 from pdf2zh_next.config.model import WatermarkOutputMode as PDF2ZHWatermarkMode
 from pdf2zh_next.translator import get_translator
 from pdf2zh_next.utils import asynchronize
+
+# Apply the dual PDF order fix
+try:
+    from fix_dual_pdf_order_v2 import apply_dual_pdf_fix_v2
+    result = apply_dual_pdf_fix_v2()
+    logging.getLogger(__name__).info(f"Dual PDF fix V2 application result: {result}")
+except Exception as e:
+    logging.getLogger(__name__).error(f"Could not apply dual PDF fix V2: {e}", exc_info=True)
 
 
 # Custom exception classes for structured error handling

@@ -555,7 +555,10 @@ def _build_settings_from_request(request: TranslationRequest, file_path: Path, o
     settings.pdf.pages = pages
     settings.pdf.no_mono = request.no_mono
     settings.pdf.no_dual = request.no_dual
+    # dual_translate_first: True = translated on left, original on right
+    logger.info(f"DEBUG: request.dual_translate_first = {request.dual_translate_first}")
     settings.pdf.dual_translate_first = request.dual_translate_first
+    logger.info(f"DEBUG: settings.pdf.dual_translate_first = {settings.pdf.dual_translate_first}")
     settings.pdf.use_alternating_pages_dual = request.use_alternating_pages_dual
 
     # Map watermark mode

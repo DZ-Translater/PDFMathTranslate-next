@@ -120,23 +120,25 @@ class PDFTranslateAPITester:
             # Default configuration
             default_config = {
                 "service": "gpt-4o-mini",
-                "lang_to": "English",
-                "lang_from": "Simplified Chinese",
-                "page_range": "All",  # Translate all pages for testing
+                "lang_from": "English",
+                "lang_to": "Simplified Chinese",
+                "page_range": "First",  # Translate all pages for testing
                 "threads": 4,
                 "no_mono": False,
                 "no_dual": False,
+                "dual_translate_first": False,  # False = original on left, translated on right (correct)
+                "use_alternating_pages_dual": False,  # Use side-by-side mode
                 "watermark_output_mode": "No Watermark",
                 "no_auto_extract_glossary": True,
                 "engine_settings": {},
-                "skip_clean": True,
-                "disable_rich_text_translate": True,
-                "enhance_compatibility": True,
+                "skip_clean": True,  # Changed from True
+                "disable_rich_text_translate": True,  # Changed from True
+                "enhance_compatibility": False,  # Changed from True
                 "split_short_lines": True,
                 "translate_table_text": True,
                 "skip_scanned_detection": True,
-                "ocr_workaround": True,
-                "auto_enable_ocr_workaround": True,
+                "ocr_workaround": True,  # Changed from True
+                "auto_enable_ocr_workaround": True,  # Changed from True
                 "ignore_cache": True,
             }
 

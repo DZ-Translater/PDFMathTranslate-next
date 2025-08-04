@@ -36,6 +36,7 @@ __license__ = "AGPL-3.0"
 __maintainer__ = "awwaawwa"
 __email__ = "aw@funstory.ai"
 
+
 __all__ = [
     "SettingsModel",
     "BasicSettings",

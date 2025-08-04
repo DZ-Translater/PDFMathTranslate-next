@@ -142,7 +142,7 @@ class PDFSettings(BaseModel):
     )
     skip_clean: bool = Field(default=False, description="Skip PDF cleaning step")
     dual_translate_first: bool = Field(
-        default=False, description="Put translated pages first in dual PDF mode"
+        default=False, description="Put translated pages first in dual PDF mode (True = translated left, original right)"
     )
     disable_rich_text_translate: bool = Field(
         default=False, description="Disable rich text translation"

@@ -352,7 +352,7 @@ def _build_translate_settings(
     # Advanced PDF Options
     skip_clean = ui_inputs.get("skip_clean")
     disable_rich_text_translate = ui_inputs.get("disable_rich_text_translate")
-    enhance_compatibility = ui_inputs.get("enhance_compatibility")
+    enhance_compatibility = False  # Always False due to known issues with dual PDF page order
     split_short_lines = ui_inputs.get("split_short_lines")
     short_line_split_factor = ui_inputs.get("short_line_split_factor")
     translate_table_text = ui_inputs.get("translate_table_text")
@@ -416,6 +416,7 @@ def _build_translate_settings(
     translate_settings.pdf.pages = pages
     translate_settings.pdf.no_mono = no_mono
     translate_settings.pdf.no_dual = no_dual
+    # dual_translate_first: True = translated on left, original on right
     translate_settings.pdf.dual_translate_first = dual_translate_first
     translate_settings.pdf.use_alternating_pages_dual = use_alternating_pages_dual
 
@@ -1191,8 +1192,9 @@ with gr.Blocks(
 
                 enhance_compatibility = gr.Checkbox(
                     label="Enhance compatibility (auto-enables skip_clean and disable_rich_text)",
-                    value=settings.pdf.enhance_compatibility,
+                    value=False,  # Always default to False
                     interactive=True,
+                    visible=False,  # Hide this option due to known issues
                 )
 
                 split_short_lines = gr.Checkbox(
@@ -1394,12 +1396,12 @@ with gr.Blocks(
         outputs=glossary_table,
     )
 
-    # Add event handler for enhance_compatibility
-    enhance_compatibility.change(
-        on_enhance_compatibility_change,
-        enhance_compatibility,
-        [skip_clean, disable_rich_text_translate],
-    )
+    # Commented out - enhance_compatibility is now hidden and always False
+    # enhance_compatibility.change(
+    #     on_enhance_compatibility_change,
+    #     enhance_compatibility,
+    #     [skip_clean, disable_rich_text_translate],
+    # )
 
     # Add event handler for split_short_lines
     split_short_lines.change(

@@ -32,7 +32,7 @@ dependencies = [
     "tomlkit",
     "peewee>=3.17.8",
     "fontTools",
-    "babeldoc>=0.3.64,<0.4.0",
+    "babeldoc>=0.4.19",
     "packaging",
     "rich",
     "pydantic-settings>=2.8.1",
