@@ -36,6 +36,7 @@ log = logging.getLogger(__name__)
 
 _no_duplicate_field_name = set()
 _no_duplicate_field_name.add("translate_engine_type")
+_no_duplicate_field_name.add("support_llm")
 
 
 class MagicDefault:
@@ -352,12 +353,7 @@ class ConfigManager:
                 if parsed:
                     env_settings[field_name] = parsed
             else:
-                try:
-                    type_hint = typing.get_type_hints(settings_model)[field_name]
-                except KeyError:
-                    log.warning(f"Field {field_name} not found in type hints")
-                    continue
-                    
+                type_hint = typing.get_type_hints(settings_model)[field_name]
                 env_name = f"{prefix}{field_name.upper()}"
 
                 if env_name in dict_vars:

@@ -71,6 +71,7 @@ class GUISettings(BaseModel):
     disable_config_auto_save: bool = Field(
         default=False, description="Disable automatic saving of configuration"
     )
+    server_port: int = Field(default=7860, description="WebUI port")
 
 
 class TranslationSettings(BaseModel):
@@ -93,6 +94,13 @@ class TranslationSettings(BaseModel):
     custom_system_prompt: str | None = Field(
         default=None,
         description='Custom system prompt for translation. It is mainly used to add the `/no_think` instruction of Qwen 3 in the prompt. e.g. --custom-system-prompt "/no_think You are a professional, authentic machine translation engine."',
+    )
+    glossaries: str | None = Field(
+        default=None,
+        description="Glossary file list.",
+    )
+    save_auto_extracted_glossary: bool = Field(
+        default=False, description="save automatically extracted glossary"
     )
     pool_max_workers: int | None = Field(
         default=None,
@@ -166,6 +174,10 @@ class PDFSettings(BaseModel):
         default=False,
         description="Enable automatic OCR workaround. If a document is detected as heavily scanned, this will attempt to enable OCR processing and skip further scan detection. See documentation for details. (default: False)",
     )
+    only_include_translated_page: bool = Field(
+        default=False,
+        description="Only include translated pages in the output PDF. Effective only when --pages is used.",
+    )
 
 
 class SettingsModel(BaseModel):
@@ -219,6 +231,10 @@ class SettingsModel(BaseModel):
 
         if not self.translate_engine_settings:
             raise ValueError("Must provide a translation service")
+
+        # Log the current translation engine being used
+        engine_name = self.translate_engine_settings.translate_engine_type
+        log.info(f"Using translation engine: {engine_name}")
 
         self.translate_engine_settings.validate_settings()
         if hasattr(self.translate_engine_settings, "transform"):

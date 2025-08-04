@@ -14,7 +14,7 @@ from pathlib import Path
 from pdf2zh_next.config import ConfigManager
 from pdf2zh_next.high_level import do_translate_file_async
 
-__version__ = "2.0.10"
+__version__ = "2.3.4"
 
 logger = logging.getLogger(__name__)
 
@@ -84,9 +84,14 @@ async def main() -> int:
         return 0
 
     if settings.basic.gui:
-        print("GUI mode has been removed. Please use the FastAPI server instead.")
-        print("Run: python api_server.py")
-        return 1
+        from pdf2zh_next.gui import setup_gui
+
+        setup_gui(
+            auth_file=settings.gui_settings.auth_file,
+            welcome_page=settings.gui_settings.welcome_page,
+            server_port=settings.gui_settings.server_port,
+        )
+        return 0
 
     assert len(settings.basic.input_files) >= 1, "At least one input file is required"
     await do_translate_file_async(settings, ignore_error=True)
