@@ -20,8 +20,6 @@ import sys
 import time
 from pathlib import Path
 from typing import Any
-from typing import Dict
-from typing import Optional
 
 import requests
 from requests.exceptions import RequestException
@@ -37,8 +35,8 @@ class PDFTranslateAPITester:
     def __init__(self, base_url: str = "http://localhost:8000"):
         self.base_url = base_url.rstrip("/")
         self.session = requests.Session()
-        self.file_id: Optional[str] = None
-        self.task_id: Optional[str] = None
+        self.file_id: str | None = None
+        self.task_id: str | None = None
 
     def test_health_check(self) -> bool:
         """Test the health check endpoint"""
@@ -90,7 +88,7 @@ class PDFTranslateAPITester:
         try:
             logger.info(f"Testing file upload with: {pdf_path}")
 
-            with open(pdf_path, "rb") as f:
+            with Path.open(pdf_path, "rb") as f:
                 files = {"file": (pdf_path.name, f, "application/pdf")}
                 response = self.session.post(f"{self.base_url}/api/files/upload", files=files)
 
@@ -98,7 +96,7 @@ class PDFTranslateAPITester:
             data = response.json()
             self.file_id = data["file_id"]
 
-            logger.info(f"✅ File uploaded successfully:")
+            logger.info("✅ File uploaded successfully:")
             logger.info(f"  - File ID: {self.file_id}")
             logger.info(f"  - Filename: {data['filename']}")
             logger.info(f"  - Size: {data['size']} bytes")
@@ -110,7 +108,7 @@ class PDFTranslateAPITester:
                 logger.error(f"Response: {e.response.text}")
             return False
 
-    def test_start_translation(self, config: Optional[Dict[str, Any]] = None) -> bool:
+    def test_start_translation(self, config: dict[str, Any] | None = None) -> bool:
         """Test starting a translation task"""
         if not self.file_id:
             logger.error("No file_id available. Upload a file first.")
@@ -122,16 +120,24 @@ class PDFTranslateAPITester:
             # Default configuration
             default_config = {
                 "service": "gpt-4o-mini",
-                "lang_from": "English",
-                "lang_to": "Simplified Chinese",
-                "page_range": "First",  # Only translate first page for testing
+                "lang_to": "English",
+                "lang_from": "Simplified Chinese",
+                "page_range": "All",  # Translate all pages for testing
                 "threads": 4,
                 "no_mono": False,
                 "no_dual": False,
                 "watermark_output_mode": "No Watermark",
                 "no_auto_extract_glossary": True,
-                "translate_table_text": True,
                 "engine_settings": {},
+                "skip_clean": True,
+                "disable_rich_text_translate": True,
+                "enhance_compatibility": True,
+                "split_short_lines": True,
+                "translate_table_text": True,
+                "skip_scanned_detection": True,
+                "ocr_workaround": True,
+                "auto_enable_ocr_workaround": True,
+                "ignore_cache": True,
             }
 
             # Merge with provided config
@@ -146,7 +152,7 @@ class PDFTranslateAPITester:
             data = response.json()
             self.task_id = data["task_id"]
 
-            logger.info(f"✅ Translation started successfully:")
+            logger.info("✅ Translation started successfully:")
             logger.info(f"  - Task ID: {self.task_id}")
             logger.info(f"  - Status: {data['status']}")
             return True
@@ -180,11 +186,11 @@ class PDFTranslateAPITester:
                 # Check if completed
                 if status["status"] == "completed":
                     logger.info("✅ Translation completed successfully!")
-                    result = status.get('result', {})
+                    result = status.get("result", {})
                     logger.info(f"  Result: {json.dumps(result, indent=2)}")
-                    
+
                     # Check storage results
-                    storage = result.get('storage', {})
+                    storage = result.get("storage", {})
                     if storage:
                         logger.info("  📦 Object Storage Results:")
                         for file_type, storage_info in storage.items():
@@ -192,7 +198,7 @@ class PDFTranslateAPITester:
                     else:
                         logger.warning("  ⚠️  No object storage results found")
                         logger.warning("     Check that ENABLE_OBJECT_STORAGE, STORAGE_API_URL, and STORAGE_API_TOKEN are set")
-                    
+
                     return True
 
                 # Check if failed
@@ -226,7 +232,7 @@ class PDFTranslateAPITester:
 
                     # Save file
                     output_path = output_dir / f"translated_{file_type}_{self.task_id}.pdf"
-                    with open(output_path, "wb") as f:
+                    with Path.open(output_path, "wb") as f:
                         f.write(response.content)
 
                     logger.info(f"✅ Downloaded {file_type} PDF: {output_path}")
@@ -283,7 +289,7 @@ class PDFTranslateAPITester:
             logger.error(f"❌ Task cleanup failed: {e}")
             return False
 
-    def run_full_workflow(self, pdf_path: Path, output_dir: Path, config: Optional[Dict[str, Any]] = None, skip_cleanup: bool = False) -> bool:
+    def run_full_workflow(self, pdf_path: Path, output_dir: Path, config: dict[str, Any] | None = None, skip_cleanup: bool = False) -> bool:
         """Run the complete API workflow test"""
         logger.info("=" * 60)
         logger.info("Starting PDFMathTranslate API Workflow Test")
