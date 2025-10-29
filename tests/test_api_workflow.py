@@ -120,8 +120,8 @@ class PDFTranslateAPITester:
             # Default configuration
             default_config = {
                 "service": "gpt-4o-mini",
-                "lang_to": "English",
-                "lang_from": "Simplified Chinese",
+                "lang_to": "Simplified Chinese",
+                "lang_from": "English",
                 "page_range": "First",  # Translate all pages for testing
                 "threads": 4,
                 "no_mono": False,
