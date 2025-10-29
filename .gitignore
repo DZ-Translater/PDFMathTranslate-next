@@ -1,6 +1,7 @@
 pdf2zh_files
 gui/pdf2zh_files
 gradio_files
+.gradio/
 tmp
 gui/gradio_files
 gui/tmp
@@ -172,18 +173,4 @@ cython_debug/
 uv.lock
 *.pdf
 *.docx
-.env
-.env.*
-
-# OS files
-Thumbs.db
-*.tmp
-
-# Editor files
-*.swp
-*.swo
-*~
-
-# Output directories
-output/
-results/
+CLAUDE.md

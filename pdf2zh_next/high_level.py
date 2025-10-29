@@ -22,17 +22,8 @@ from babeldoc.main import create_progress_handler
 from rich.logging import RichHandler
 
 from pdf2zh_next.config.model import SettingsModel
-from pdf2zh_next.config.model import WatermarkOutputMode as PDF2ZHWatermarkMode
 from pdf2zh_next.translator import get_translator
 from pdf2zh_next.utils import asynchronize
-
-# Apply the dual PDF order fix
-try:
-    from fix_dual_pdf_order_v2 import apply_dual_pdf_fix_v2
-    result = apply_dual_pdf_fix_v2()
-    logging.getLogger(__name__).info(f"Dual PDF fix V2 application result: {result}")
-except Exception as e:
-    logging.getLogger(__name__).error(f"Could not apply dual PDF fix V2: {e}", exc_info=True)
 
 
 # Custom exception classes for structured error handling
@@ -439,12 +430,17 @@ def create_babeldoc_config(settings: SettingsModel, file: Path) -> BabelDOCConfi
         )
 
     # 设置水印模式
-    if settings.pdf.watermark_output_mode == PDF2ZHWatermarkMode.Both:
-        watermark_mode = BabelDOCWatermarkMode.Both
-    elif settings.pdf.watermark_output_mode == PDF2ZHWatermarkMode.NoWatermark:
-        watermark_mode = BabelDOCWatermarkMode.NoWatermark
-    else:
-        watermark_mode = BabelDOCWatermarkMode.Watermarked
+    watermark_output_mode_maps = {
+        "no_watermark": BabelDOCWatermarkMode.NoWatermark,
+        "both": BabelDOCWatermarkMode.Both,
+        "watermarked": BabelDOCWatermarkMode.Watermarked,
+    }
+
+    watermark_output_mode = settings.pdf.watermark_output_mode
+
+    watermark_mode = watermark_output_mode_maps.get(
+        watermark_output_mode, BabelDOCWatermarkMode.Watermarked
+    )
 
     table_model = None
     if settings.pdf.translate_table_text:
@@ -491,6 +487,12 @@ def create_babeldoc_config(settings: SettingsModel, file: Path) -> BabelDOCConfi
         auto_extract_glossary=not settings.translation.no_auto_extract_glossary,
         primary_font_family=settings.translation.primary_font_family,
         only_include_translated_page=settings.pdf.only_include_translated_page,
+        # BabelDOC v0.5.1 new options
+        merge_alternating_line_numbers=not settings.pdf.no_merge_alternating_line_numbers,
+        remove_non_formula_lines=not settings.pdf.no_remove_non_formula_lines,
+        non_formula_line_iou_threshold=settings.pdf.non_formula_line_iou_threshold,
+        figure_table_protection_threshold=settings.pdf.figure_table_protection_threshold,
+        skip_formula_offset_calculation=settings.pdf.skip_formula_offset_calculation,
     )
     return babeldoc_config
 

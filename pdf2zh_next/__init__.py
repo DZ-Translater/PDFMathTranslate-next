@@ -30,7 +30,7 @@ from pdf2zh_next.high_level import do_translate_file_async
 
 # from pdf2zh_next.high_level import translate, translate_stream
 
-__version__ = "2.3.4"
+__version__ = "2.6.4"
 __author__ = "Byaidu, awwaawwa"
 __license__ = "AGPL-3.0"
 __maintainer__ = "awwaawwa"
@@ -67,4 +67,5 @@ __all__ = [
     "do_translate_async_stream",
     "create_babeldoc_config",
     "ConfigManager",
+    "ClaudeCodeSettings",
 ]

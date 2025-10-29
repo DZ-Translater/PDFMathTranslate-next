@@ -1,6 +1,6 @@
 [project]
 name = "pdf2zh-next"
-version = "2.0.10"
+version = "2.6.4"
 description = "Latex PDF Translator"
 authors = [
     { name = "awwaawwa", email = "aw@funstory.ai" },
@@ -28,11 +28,14 @@ dependencies = [
     "deepl",
     "openai>=1.0.0",
     "azure-ai-translation-text<=1.0.1",
+    # 5.36 has a bug, webui starts with a white screen
+    "gradio<5.36",
     "tencentcloud-sdk-python-tmt",
+    "gradio-pdf>=0.0.21",
     "tomlkit",
     "peewee>=3.17.8",
     "fontTools",
-    "babeldoc>=0.4.19",
+    "babeldoc>=0.5.7,<0.6.0",
     "packaging",
     "rich",
     "pydantic-settings>=2.8.1",
@@ -43,6 +46,9 @@ dependencies = [
     "uvicorn[standard]>=0.34.2",
     "python-multipart>=0.0.6",
     "legacy-cgi; python_version >= '3.13'",
+    "chardet>=5.2.0",
+    "gradio-i18n>=0.3.1",
+    "pyyaml>=6.0.2",
 ]
 
 [dependency-groups]
@@ -56,7 +62,7 @@ dev = [
     "markdown-include>=0.8.1",
     "mkdocs-git-authors-plugin>=0.9.5",
     "mkdocs-git-committers-plugin>=0.2.3",
-    "mkdocs-git-revision-date-localized-plugin>=1.4.5",
+    "mkdocs-git-revision-date-localized-plugin>=1.4.7",
     "mkdocs-material[recommended]>=9.6.4",
     "mkdocs-static-i18n>=1.3.0",
 ]
@@ -80,7 +86,7 @@ max-line-length = 88
 
 
 [bumpver]
-current_version = "2.0.10"
+current_version = "2.6.4"
 version_pattern = "MAJOR.MINOR.PATCH[.PYTAGNUM]"
 
 [bumpver.file_patterns]
@@ -122,6 +128,7 @@ ignore = [
     "B024",   # abstract class without abstract methods
     "S112",   # `try`-`except`-`continue` detected, consider logging the exception
     "COM812", # missing-trailing-comma
+    "S603",   # `subprocess` call: check for execution of untrusted input
 
 ]
 select = [

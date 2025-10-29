@@ -26,6 +26,8 @@
   <!-- License -->
   <a href="./LICENSE">
     <img src="https://img.shields.io/github/license/PDFMathTranslate/PDFMathTranslate-next"></a>
+  <a href="https://hosted.weblate.org/engage/pdfmathtranslate-next/">
+    <img src="https://hosted.weblate.org/widget/pdfmathtranslate-next/svg-badge.svg" alt="translation status" /></a>
 </p>
 
 <a href="https://trendshift.io/repositories/12424" target="_blank"><img src="https://trendshift.io/api/badge/repositories/12424" alt="Byaidu%2FPDFMathTranslate | Trendshift" style="width: 250px; height: 55px;" width="250" height="55"/></a>
@@ -38,7 +40,14 @@ PDF scientific paper translation and bilingual comparison.
 - 🌐 Support [multiple languages](https://pdf2zh-next.com/supported_languages.html), and diverse [translation services](https://pdf2zh-next.com/advanced/Documentation-of-Translation-Services.html).
 - 🤖 Provides [commandline tool](https://pdf2zh-next.com/getting-started/USAGE_commandline.html), [interactive user interface](https://pdf2zh-next.com/getting-started/USAGE_webui.html), and [Docker](https://pdf2zh-next.com/getting-started/INSTALLATION_docker.html)
 
-Feel free to provide feedback in [GitHub Issues](https://github.com/PDFMathTranslate/PDFMathTranslate-next/issues) or [Telegram Group](https://t.me/+Z9_SgnxmsmA5NzBl).
+<!-- Feel free to provide feedback in [GitHub Issues](https://github.com/PDFMathTranslate/PDFMathTranslate-next/issues) or [Telegram Group](https://t.me/+Z9_SgnxmsmA5NzBl). -->
+
+> [!WARNING]
+>
+> This project is provided "as is" under the [AGPL v3](https://github.com/PDFMathTranslate/PDFMathTranslate-next/blob/main/LICENSE) license, and no guarantees are provided for the quality and performance of the program. **The entire risk of the program's quality and performance is borne by you.** If the program is found to be defective, you will be responsible for all necessary service, repair, or correction costs.
+>
+> Due to the maintainers' limited energy, we do not provide any form of usage assistance or problem-solving. Related issues will be closed directly! (Pull requests to improve project documentation are welcome; bugs or friendly issues that follow the issue template are not affected by this)
+
 
 For details on how to contribute, please consult the [Contribution Guide](https://pdf2zh-next.com/community/Contribution-Guide.html).
 
@@ -87,7 +96,7 @@ Note that the computing resources of the demo are limited, so please avoid abusi
 ### Usage
 
 1. [Using **WebUI**](https://pdf2zh-next.com/getting-started/USAGE_webui.html)
-2. [Using **Zotero Plugin**](https://github.com/guaguastandup/zotero-pdf2zh) (Third party programm)
+2. [Using **Zotero Plugin**](https://github.com/guaguastandup/zotero-pdf2zh) (Third party program)
 3. [Using **Commandline**](https://pdf2zh-next.com/getting-started/USAGE_commandline.html)
 
 For different use cases, we provide distinct methods to use our program. Check out [this page](./getting-started/getting-started.md) for more information.
@@ -133,30 +142,31 @@ If you don't know what code to use to translate to the language you need, check 
 
 - [Immersive Translation](https://immersivetranslate.com) sponsors monthly Pro membership redemption codes for active contributors to this project, see details at: [CONTRIBUTOR_REWARD.md](https://github.com/funstory-ai/BabelDOC/blob/main/docs/CONTRIBUTOR_REWARD.md)
 
+- [SiliconFlow](https://siliconflow.cn) provides a free translation service for this project, powered by large language models (LLMs).
+
 - 1.x version: [Byaidu/PDFMathTranslate](https://github.com/Byaidu/PDFMathTranslate)
 
 
-- New backend: [BabelDOC](https://github.com/funstory-ai/BabelDOC)
+- backend: [BabelDOC](https://github.com/funstory-ai/BabelDOC)
 
-- Document merging: [PyMuPDF](https://github.com/pymupdf/PyMuPDF)
+- PDF Library: [PyMuPDF](https://github.com/pymupdf/PyMuPDF)
 
-- Document parsing: [Pdfminer.six](https://github.com/pdfminer/pdfminer.six)
+- PDF Parsing: [Pdfminer.six](https://github.com/pdfminer/pdfminer.six)
 
-- Document extraction: [MinerU](https://github.com/opendatalab/MinerU)
+- PDF Preview: [Gradio PDF](https://github.com/freddyaboulton/gradio-pdf)
 
-- Web Interface: FastAPI with modern HTML/CSS/JavaScript frontend
+- Layout Parsing: [DocLayout-YOLO](https://github.com/opendatalab/DocLayout-YOLO)
 
-- Multi-threaded translation: [MathTranslate](https://github.com/SUSYUSTC/MathTranslate)
+- PDF Standards: [PDF Explained](https://zxyle.github.io/PDF-Explained/), [PDF Cheat Sheets](https://pdfa.org/resource/pdf-cheat-sheets/)
 
-- Layout parsing: [DocLayout-YOLO](https://github.com/opendatalab/DocLayout-YOLO)
-
-- Document standard: [PDF Explained](https://zxyle.github.io/PDF-Explained/), [PDF Cheat Sheets](https://pdfa.org/resource/pdf-cheat-sheets/)
-
-- Multilingual Font: [Go Noto Universal](https://github.com/satbyy/go-noto-universal)
+- Multilingual Font: see [BabelDOC-Assets](https://github.com/funstory-ai/BabelDOC-Assets)
 
 - [Asynchronize](https://github.com/multimeric/Asynchronize/tree/master?tab=readme-ov-file)
 
 - [Rich logging with multiprocessing](https://github.com/SebastianGrans/Rich-multiprocess-logging/tree/main)
+
+- Documentation i18n using [Weblate](https://hosted.weblate.org/projects/pdfmathtranslate-next/) 
+
 
 <h2 id="conduct">Before submit your code</h2>
 

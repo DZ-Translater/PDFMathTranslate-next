@@ -72,6 +72,7 @@ class GUISettings(BaseModel):
         default=False, description="Disable automatic saving of configuration"
     )
     server_port: int = Field(default=7860, description="WebUI port")
+    ui_lang: str | None = Field(default="en", description="UI language")
 
 
 class TranslationSettings(BaseModel):
@@ -142,7 +143,7 @@ class PDFSettings(BaseModel):
     )
     skip_clean: bool = Field(default=False, description="Skip PDF cleaning step")
     dual_translate_first: bool = Field(
-        default=False, description="Put translated pages first in dual PDF mode (True = translated left, original right)"
+        default=False, description="Put translated pages first in dual PDF mode"
     )
     disable_rich_text_translate: bool = Field(
         default=False, description="Disable rich text translation"
@@ -153,9 +154,9 @@ class PDFSettings(BaseModel):
     use_alternating_pages_dual: bool = Field(
         default=False, description="Use alternating pages mode for dual PDF"
     )
-    watermark_output_mode: WatermarkOutputMode = Field(
-        default=WatermarkOutputMode.Watermarked,
-        description="Watermark output mode for PDF files",
+    watermark_output_mode: str = Field(
+        default="watermarked",
+        description="Watermark output mode for PDF files (watermarked, no_watermark, or both)",
     )
     max_pages_per_part: int | None = Field(
         default=None, description="Maximum pages per part for split translation"
@@ -177,6 +178,26 @@ class PDFSettings(BaseModel):
     only_include_translated_page: bool = Field(
         default=False,
         description="Only include translated pages in the output PDF. Effective only when --pages is used.",
+    )
+    no_merge_alternating_line_numbers: bool = Field(
+        default=False,
+        description="Handle alternating line numbers and text paragraphs in documents with line numbers",
+    )
+    no_remove_non_formula_lines: bool = Field(
+        default=False,
+        description="Remove non-formula lines within paragraph areas",
+    )
+    non_formula_line_iou_threshold: float = Field(
+        default=0.9,
+        description="IoU threshold for identifying non-formula lines",
+    )
+    figure_table_protection_threshold: float = Field(
+        default=0.9,
+        description="Protection threshold for figures and tables (lines within figures/tables will not be processed)",
+    )
+    skip_formula_offset_calculation: bool = Field(
+        default=False,
+        description="Skip formula offset calculation during processing",
     )
 
 
@@ -276,10 +297,24 @@ class SettingsModel(BaseModel):
         if self.pdf.max_pages_per_part and self.pdf.max_pages_per_part < 0:
             raise ValueError("max_pages_per_part must be greater than 0")
 
-        if self.pdf.watermark_output_mode not in WatermarkOutputMode:
+        # Validate and store watermark mode
+        watermark_output_mode_maps = {
+            "nowatermark": "no_watermark",
+            "no_watermark": "no_watermark",
+            "watermarked": "watermarked",
+            "both": "both",
+        }
+
+        watermark_output_mode = self.pdf.watermark_output_mode.lower()
+        if watermark_output_mode not in watermark_output_mode_maps:
             raise ValueError(
-                f"Invalid watermark output mode: {self.pdf.watermark_output_mode}"
+                f"Invalid watermark output mode: {watermark_output_mode}. "
+                f"Valid modes: {', '.join(watermark_output_mode_maps.keys())}"
             )
+
+        self.pdf.watermark_output_mode = watermark_output_mode_maps[
+            watermark_output_mode
+        ]
 
         if self.translation.qps < 1:
             raise ValueError("qps must be greater than 0")
@@ -307,6 +342,16 @@ class SettingsModel(BaseModel):
                 f"Invalid primary font family: {self.translation.primary_font_family}"
             )
 
+        if not (0.0 <= self.pdf.non_formula_line_iou_threshold <= 1.0):
+            raise ValueError(
+                "non_formula_line_iou_threshold must be between 0.0 and 1.0"
+            )
+
+        if not (0.0 <= self.pdf.figure_table_protection_threshold <= 1.0):
+            raise ValueError(
+                "figure_table_protection_threshold must be between 0.0 and 1.0"
+            )
+
         if self.pdf.auto_enable_ocr_workaround and self.pdf.ocr_workaround:
             self.pdf.ocr_workaround = False
             log.warning(
@@ -318,6 +363,10 @@ class SettingsModel(BaseModel):
             log.warning(
                 "After enabling automatic OCR Workaround, scan version detection will be forcibly enabled."
             )
+
+        if self.translate_engine_settings.translate_engine_type == "SiliconFlowFree":
+            # Force qps to 20 for SiliconFlowFree
+            self.translation.qps = 20
 
     def parse_pages(self) -> list[tuple[int, int]] | None:
         """Parse pages string into list of page ranges"""

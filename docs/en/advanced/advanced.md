@@ -7,6 +7,10 @@
 - [Command Line Args](#command-line-args)
   - [Args](#args)
   - [GUI Args](#gui-args)
+- [Rate Limiting Configuration Guide](#rate-limiting-configuration-guide)
+  - [RPM (Requests Per Minute) Rate Limiting](#rpm-requests-per-minute-rate-limiting)
+  - [Concurrent Connection Limiting](#concurrent-connection-limiting)
+  - [Best Practices](#best-practices)
 - [Partial translation](#partial-translation)
 - [Specify source and target languages](#specify-source-and-target-languages)
 - [Translate wih exceptions](#translate-wih-exceptions)
@@ -16,6 +20,7 @@
 - [Translation cache](#translation-cache)
 - [Deployment as a public services](#deployment-as-a-public-services)
 - [Authentication and welcome page](#authentication-and-welcome-page)
+- [Glossary Support](#glossary-support)
 
 ---
 
@@ -23,7 +28,7 @@
 
 Execute the translation command in the command line to generate the translated document `example-mono.pdf` and the bilingual document `example-dual.pdf` in the current working directory. Use Google as the default translation service. More support translation services can find [HERE](https://github.com/PDFMathTranslate/PDFMathTranslate-next/blob/main/docs/ADVANCED.md#services).
 
-<img src="./../images/cmd_light.svg" width="580px"  alt="cmd"/>
+<img src="./../../images/cmd_light.svg" width="580px"  alt="cmd"/>
 
 In the following table, we list all advanced options for reference:
 
@@ -46,7 +51,7 @@ In the following table, we list all advanced options for reference:
 | `--version`                     | Show version then exit                                                                 | `pdf2zh --version`                                                                                                   |
 | `--pages`                       | Partial document translation                                                           | `pdf2zh example.pdf --pages 1,2,1-,-3,3-5`                                                                           |
 | `--lang-in`                     | The code of source language                                                            | `pdf2zh example.pdf --lang-in en`                                                                                    |
-| `--lang-out`                    | The code of target language                                                            | `pdf2zh example.pdf --lang-out zh`                                                                                   |
+| `--lang-out`                    | The code of target language                                                            | `pdf2zh example.pdf --lang-out zh-CN`                                                                                |
 | `--min-text-length`             | Minimum text length to translate                                                       | `pdf2zh example.pdf --min-text-length 5`                                                                             |
 | `--rpc-doclayout`               | RPC service host address for document layout analysis                                  |                                                                                                                      |
 | `--qps`                         | QPS limit for translation service                                                      | `pdf2zh example.pdf --qps 200`                                                                                       |
@@ -62,8 +67,7 @@ In the following table, we list all advanced options for reference:
 | `--split-short-line`            | Force split short line into different paragraphs                                       | `pdf2zh example.pdf --split-short-line`                                                                              |
 | `--short-line-split-factor`     | Split threshold factor for short lines                                                 |                                                                                                                      |
 | `--skip-clean`                  | Skip PDF cleaning step                                                                 | `pdf2zh example.pdf --skip-clean`                                                                                    |
-| `--dual-translate-first`        | 在双 PDF 模式下优先放置翻译页                                          | `pdf2zh example.pdf --dual-TRANSLATE-first`                                                                          |
-| `--dual-TRANSLATE-first`        | Put translated pages first in dual PDF mode                                            | `pdf2zh example.pdf --dual-TRANSLATE-first`                                                                          |
+| `--dual-translate-first`        | 在双 PDF 模式下优先放置翻译页                                          | `pdf2zh example.pdf --dual-translate-first`                                                                                            |
 | `--disable-rich-text-translate` | Disable rich text translation                                                          | `pdf2zh example.pdf --disable-rich-text-translate`                                                                   |
 | `--enhance-compatibility`       | Enable all compatibility enhancement options                                           | `pdf2zh example.pdf --enhance-compatibility`                                                                         |
 | `--use-alternating-pages-dual`  | Use alternating pages mode for dual PDF                                                | `pdf2zh example.pdf --use-alternating-pages-dual`                                                                    |
@@ -73,6 +77,14 @@ In the following table, we list all advanced options for reference:
 | `--skip-scanned-detection`      | Skip scanned detection                                                                 | `pdf2zh example.pdf --skip-scanned-detection`                                                                        |
 | `--ocr-workaround`              | Force translated text to be black and add white background                             | `pdf2zh example.pdf --ocr-workaround`                                                                                |
 | `--auto-enable-ocr-workaround`  | Enable automatic OCR workaround. If a document is detected as heavily scanned, this will attempt to enable OCR processing and skip further scan detection. See documentation for details. (default: False) | `pdf2zh example.pdf --auto-enable-ocr-workaround True`                    |
+| `--only-include-translated-page`| Only include translated pages in the output PDF. Effective only when --pages is used. | `pdf2zh example.pdf --pages 1-5 --only-include-translated-page`                                                       |
+| `--glossaries`                  | Custom glossary for translation.                                                      | `pdf2zh example.pdf --glossaries "glossary1.csv,glossary2.csv,glossary3.csv"`                                         |
+| `--save-auto-extracted-glossary`| save automatically extracted glossary.                                                | `pdf2zh example.pdf --save-auto-extracted-glossary`                                                                   |
+| `--no-merge-alternating-line-numbers` | Disable merging of alternating line numbers and text paragraphs in documents with line numbers | `pdf2zh example.pdf --no-merge-alternating-line-numbers` |
+| `--no-remove-non-formula-lines` | Disable removal of non-formula lines within paragraph areas                          | `pdf2zh example.pdf --no-remove-non-formula-lines`                                                                    |
+| `--non-formula-line-iou-threshold` | Set IoU threshold for identifying non-formula lines (0.0-1.0)                     | `pdf2zh example.pdf --non-formula-line-iou-threshold 0.85`                                                            |
+| `--figure-table-protection-threshold` | Set protection threshold for figures and tables (0.0-1.0). Lines within figures/tables will not be processed | `pdf2zh example.pdf --figure-table-protection-threshold 0.95` |
+| `--skip-formula-offset-calculation` | Skip formula offset calculation during processing         | `pdf2zh example.pdf --skip-formula-offset-calculation`                                                                |
 
 
 ##### GUI Args
@@ -85,6 +97,65 @@ In the following table, we list all advanced options for reference:
 | `--enabled-services`            | Enabled translation services           | `pdf2zh --gui --enabled-services "Bing,OpenAI"` |
 | `--disable-gui-sensitive-input` | Disable GUI sensitive input            | `pdf2zh --gui --disable-gui-sensitive-input`    |
 | `--disable-config-auto-save`    | Disable automatic configuration saving | `pdf2zh --gui --disable-config-auto-save`       |
+| `--server-port`                 | WebUI Port                             | `pdf2zh --gui --server-port 7860`               |
+
+[⬆️ Back to top](#toc)
+
+---
+
+#### Rate Limiting Configuration Guide
+
+When using translation services, proper rate limiting configuration is crucial to avoid API errors and optimize performance. This guide explains how to configure `--qps` and `--pool-max-worker` parameters based on different upstream service limitations.
+
+> [!TIP]
+>
+> It is recommended that the pool_size does not exceed 1000. If the pool_size calculated by the following method exceeds 1000, please use 1000.
+
+##### RPM (Requests Per Minute) Rate Limiting
+
+When the upstream service has RPM limitations, use the following calculation:
+
+**Calculation Formula:**
+- `qps = floor(rpm / 60)`
+- `pool_size = qps * 10`
+
+> [!NOTE]
+> The factor of 10 is an empirical coefficient that generally works well for most scenarios.
+
+**Example:**
+If your translation service has a limit of 600 RPM:
+- `qps = floor(600 / 60) = 10`
+- `pool_size = 10 * 10 = 100`
+
+```bash
+pdf2zh example.pdf --qps 10 --pool-max-worker 100
+```
+
+##### Concurrent Connection Limiting
+
+When the upstream service has concurrent connection limitations (like GLM official service), use this approach:
+
+**Calculation Formula:**
+- `pool_size = max(floor(0.9 * official_concurrent_limit), official_concurrent_limit - 20)`
+- `qps = pool_size`
+
+**Example:**
+If your translation service allows 50 concurrent connections:
+- `pool_size = max(floor(0.9 * 50), 50 - 20) = max(45, 30) = 45`
+- `qps = 45`
+
+```bash
+pdf2zh example.pdf --qps 45 --pool-max-worker 45
+```
+
+##### Best Practices
+
+> [!TIP]
+> - Always start with conservative values and gradually increase if needed
+> - Monitor your service's response times and error rates
+> - Different services may require different optimization strategies
+> - Consider your specific use case and document size when setting these parameters
+
 
 [⬆️ Back to top](#toc)
 
@@ -199,7 +270,6 @@ pdf2zh_next --gui
 
 - Modifying Configuration via **Environment Variables**
 
-<!-- TODO 放一个环境变量的示意图在这里 -->
 You can replace the `--` in command line arguments with `PDF2ZH_`, connect parameters using `=`, and replace `-` with `_` as environment variables.
 
 For example, if you want to enable a GUI window, you can use the following command:
@@ -208,7 +278,7 @@ For example, if you want to enable a GUI window, you can use the following comma
 PDF2ZH_GUI=TRUE pdf2zh_next
 ```
 
-<img src="./../images/ev_light.svg" width="580px"  alt="env"/>
+<img src="./../../images/ev_light.svg" width="580px"  alt="env"/>
 
 - User-Specified **Configuration File**
 
@@ -273,8 +343,13 @@ pdf2zh_next example.pdf --ignore-cache
 
 When deploying a pdf2zh GUI on public services, you should modify the configuration file as described below.
 
+> [!WARNING]
+>
+> This project has not been professionally audited for security, and may contain security vulnerabilities. Please evaluate the risks and take necessary security measures before deploying on public networks.
+
+
 > [!TIP]
-> - When deploying publicly, both `disable_gui_sensitive_input` and `disable_config_auto_save` should be enabled.
+> - When deploying publicly, both disable_gui_sensitive_input and disable_config_auto_save should be enabled.
 > - Separate different available services with *English commas* <kbd>,</kbd> .
 
 A usable configuration is as follows:
@@ -340,5 +415,29 @@ welcome_page = "/path/to/welcome/html/file"
 
 [⬆️ Back to top](#toc)
 
-<div align="right">
-<h6><small>Some content on this page has been translated by GPT and may contain errors.</small></h6>
+---
+
+#### Glossary Support
+
+PDFMathTranslate supports the glossary table. The glossary tables file should be `csv` file.
+There are three columns in file. Here is a demo glossary file:
+
+| source | target  | tgt_lng |
+|--------|---------|---------|
+| AutoML | 自动 ML  | zh-CN   |
+| a,a    | a       | zh-CN   |
+| "      | "       | zh-CN   |
+
+
+For CLI user:
+You can use multiple files for glossary. And different files should be split by `,`.
+
+```bash
+pdf2zh_next example.pdf --glossaries "glossary1.csv,glossary2.csv,glossary3.csv"
+```
+
+For WebUI user:
+
+You can upload your own glossary file now. After you uploaded the file, you can check them by click their name and the content shows below.
+
+[⬆️ Back to top](#toc)
