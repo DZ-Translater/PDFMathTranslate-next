@@ -2,11 +2,9 @@ FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
 
 WORKDIR /app
 
-
-EXPOSE 7860
-
 ENV PYTHONUNBUFFERED=1
 
+# Install system dependencies
 # # Download all required fonts
 # ADD "https://github.com/satbyy/go-noto-universal/releases/download/v7.0/GoNotoKurrent-Regular.ttf" /app/
 # ADD "https://github.com/timelic/source-han-serif/releases/download/main/SourceHanSerifCN-Regular.ttf" /app/
@@ -29,4 +27,16 @@ ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
 RUN uv pip install --system --no-cache . && uv pip install --system --no-cache --compile-bytecode -U babeldoc "pymupdf<1.25.3" && babeldoc --version && babeldoc --warmup
 RUN pdf2zh --version
-CMD ["pdf2zh", "--gui"]
+
+# Create directories for static files and uploads
+RUN mkdir -p /app/static /app/pdf2zh_files
+
+# Set environment variables for API server
+ENV HOST=0.0.0.0
+ENV PORT=8000
+
+# Expose the port
+EXPOSE 8000
+
+# Run the API server
+CMD ["python", "api_server.py"]
