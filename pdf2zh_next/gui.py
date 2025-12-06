@@ -1278,7 +1278,7 @@ with gr.Blocks(
         render=False,
     )
     with Translate(get_translation_dic(translation_file_path), lang_selector):
-        gr.Markdown("# [PDFMathTranslate Next](https://pdf2zh-next.com)")
+        # gr.Markdown("# [PDFMathTranslate Next](https://pdf2zh-next.com)")
 
         translation_engine_arg_inputs = []
         detail_text_inputs = []
@@ -1943,10 +1943,10 @@ with gr.Blocks(
                 cancel_btn = gr.Button(_("Cancel"), variant="secondary")
                 save_btn = gr.Button(_("Save Settings"), variant="secondary")
 
-                tech_details = gr.Markdown(
-                    tech_details_string,
-                    elem_classes=["secondary-text"],
-                )
+                # tech_details = gr.Markdown(
+                #     tech_details_string,
+                #     elem_classes=["secondary-text"],
+                # )
 
             with gr.Column(scale=2):
                 gr.Markdown(_("## Preview"))
