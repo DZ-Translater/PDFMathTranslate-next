@@ -174,3 +174,6 @@ uv.lock
 *.pdf
 *.docx
 CLAUDE.md
+.env*
+config.v3.toml
+
