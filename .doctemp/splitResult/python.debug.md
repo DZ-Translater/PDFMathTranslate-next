@@ -1,8 +1,8 @@
-<!-- CHUNK ID: chunk_F076772C  CHUNK TYPE: blockquote START_LINE:1 -->
+<!-- CHUNK ID: chunk_0441863E  CHUNK TYPE: blockquote START_LINE:1 -->
 > [!NOTE]
 > This documentation may contain AI-generated content. While we strive for accuracy, there might be inaccuracies. Please report any issues via:
 >
-> - [GitHub Issues](https://github.com/PDFMathTranslate/PDFMathTranslate-next/issues)
+> - [GitHub Issues](https://github.com/PDFMathTranslate-next/PDFMathTranslate-next/issues)
 > - Community contribution (PRs welcome!)
 
 <!-- CHUNK ID: chunk_0B12F3B2  CHUNK TYPE: header START_LINE:7 -->

@@ -1,7 +1,7 @@
 <!-- CHUNK ID: chunk_F3B96F2D  CHUNK TYPE: paragraph START_LINE:1 -->
 [**Getting Started**](./getting-started.md) > **Installation** > **Docker** _(current)_
 
-<!-- CHUNK ID: h_rule_31939f38  CHUNK TYPE: h_rule START_LINE:3 -->
+<!-- CHUNK ID: h_rule_040a7790  CHUNK TYPE: h_rule START_LINE:3 -->
 ---
 
 <!-- CHUNK ID: chunk_3EBE8361  CHUNK TYPE: header START_LINE:5 -->
@@ -25,14 +25,14 @@ docker pull awwaawwa/pdfmathtranslate-next
 docker run -d -p 7860:7860 awwaawwa/pdfmathtranslate-next
 ```
 
-<!-- CHUNK ID: chunk_B1F3E7B5  CHUNK TYPE: blockquote START_LINE:20 -->
+<!-- CHUNK ID: chunk_CEAB798C  CHUNK TYPE: blockquote START_LINE:20 -->
 > [!NOTE]
 > 
-> - If you cannot access Docker Hub, please try the image on [GitHub Container Registry](https://github.com/PDFMathTranslate/PDFMathTranslate-next/pkgs/container/pdfmathtranslate).
+> - If you cannot access Docker Hub, please try the image on [GitHub Container Registry](https://github.com/PDFMathTranslate-next/PDFMathTranslate-next/pkgs/container/pdfmathtranslate).
 > 
 > ```bash
-> docker pull ghcr.io/PDFMathTranslate/PDFMathTranslate-next
-> docker run -d -p 7860:7860 ghcr.io/PDFMathTranslate/PDFMathTranslate-next
+> docker pull ghcr.io/pdfmathtranslate-next/pdfmathtranslate-next
+> docker run -d -p 7860:7860 ghcr.io/pdfmathtranslate-next/pdfmathtranslate-next
 > ```
 
 <!-- CHUNK ID: chunk_0222B95B  CHUNK TYPE: paragraph START_LINE:29 -->
@@ -49,18 +49,18 @@ http://localhost:7860/
 
 > [!NOTE]
 > If you encounter any issues during use command line, please refer to [Usage --> Command Line](./USAGE_commandline.md).
-<!-- CHUNK ID: chunk_0B40829E  CHUNK TYPE: html_comment START_LINE:40 -->
+<!-- CHUNK ID: chunk_B026E889  CHUNK TYPE: html_comment START_LINE:40 -->
 <!-- 
 #### For docker deployment on cloud service:
 
 <div>
-<a href="https://www.heroku.com/deploy?template=https://github.com/PDFMathTranslate/PDFMathTranslate-next">
+<a href="https://www.heroku.com/deploy?template=https://github.com/PDFMathTranslate-next/PDFMathTranslate-next">
   <img src="https://www.herokucdn.com/deploy/button.svg" alt="Deploy" height="26"></a>
 <a href="https://render.com/deploy">
   <img src="https://render.com/images/deploy-to-render-button.svg" alt="Deploy to Koyeb" height="26"></a>
 <a href="https://zeabur.com/templates/5FQIGX?referralCode=reycn">
   <img src="https://zeabur.com/button.svg" alt="Deploy on Zeabur" height="26"></a>
-<a href="https://app.koyeb.com/deploy?type=git&builder=buildpack&repository=github.com/PDFMathTranslate/PDFMathTranslate-next&branch=main&name=pdf-math-translate">
+<a href="https://app.koyeb.com/deploy?type=git&builder=buildpack&repository=github.com/PDFMathTranslate-next/PDFMathTranslate-next&branch=main&name=pdf-math-translate">
   <img src="https://www.koyeb.com/static/images/deploy/button.svg" alt="Deploy to Koyeb" height="26"></a>
 </div>
 
