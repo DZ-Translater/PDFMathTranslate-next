@@ -177,3 +177,4 @@ CLAUDE.md
 .env*
 config.v3.toml
 
+configs/default/2.*.toml
